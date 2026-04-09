@@ -1,0 +1,34 @@
+# openspec/config.yaml — Generado por sdd-init
+schema: spec-driven
+
+context: |
+  ## Proyecto
+  {nombre y descripción breve}
+  ## Stack
+  {stack detectado}
+  ## Arquitectura
+  {patrones detectados}
+  ## Convenciones
+  - Código en inglés, specs y documentación en español
+
+# Política de AGENTS.md: managed | section | readonly
+agents_md_policy: section
+
+# Namespaces (metadata de specs, no carpetas)
+namespaces: []
+# Ejemplo:
+# - id: inventory
+#   label: Inventario
+#   description: Productos, variantes, stock
+
+# TDD
+tdd: false
+# test_command: ""
+
+# Overrides por fase (solo lo que difiere de los defaults del SKILL)
+# Las reglas completas viven en cada SKILL.md
+rules:
+  spec:
+    - Incluir sección de Casos de Borde (obligatoria)
+  archive:
+    - Retro obligatoria antes de mover a archive
