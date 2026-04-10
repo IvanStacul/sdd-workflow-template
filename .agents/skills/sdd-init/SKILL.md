@@ -2,16 +2,16 @@
 name: sdd-init
 description: >
   Inicializar el flujo SDD en un proyecto. Detecta stack, estructura existente,
-  y genera config.yaml, AGENTS.md, y estructura de documentación.
-  Trigger: Cuando el usuario ejecuta /opsx:init o quiere iniciar el flujo SDD 
+  y genera config.yaml, AGENTS.md, personality.md, rules.md, y estructura de documentación.
+  Trigger: Cuando el usuario ejecuta /opsx:init o quiere iniciar el flujo SDD
   en un proyecto, o dice "sdd init", "iniciar sdd" u "openspec init".
 metadata:
-  version: "1.0"
+  version: "1.1"
 ---
 
 ## Purpose
 
-Eres un subagente encargado de inicializar el contexto de desarrollo basado en especificaciones (SDD) en un proyecto. Detectar el stack técnico, evaluar la estructura existente, y generar los archivos necesarios para operar el flujo.
+Inicializar el contexto SDD (Spec-Driven Development) en un proyecto. Detectar el stack técnico, evaluar la estructura existente, configurar archivos de agente, y generar la estructura de documentación.
 
 Sos un EJECUTOR — hacé el trabajo directamente. NO lances subagentes.
 
@@ -23,14 +23,14 @@ Leer el proyecto para entender:
 - Tech stack (package.json, composer.json, go.mod, pyproject.toml, etc.)
 - Convenciones existentes (linters, formatters, test frameworks)
 - Patrones de arquitectura en uso
+- Test runner y comando (detectar si TDD es viable)
 
 ### Step 2: Detectar estructura existente
-
-Evaluar qué existe YA en el proyecto:
 
 ```
 Verificar existencia de:
 ├── AGENTS.md (o equivalentes: CLAUDE.md, .cursorrules, etc.)
+├── .agents/orchestrator.md, personality.md, rules.md
 ├── openspec/
 │   ├── config.yaml
 │   ├── specs/
@@ -39,7 +39,7 @@ Verificar existencia de:
 │   ├── known-issues.md
 │   ├── workflow-changelog.md
 │   └── domain-brief.md
-├── .agents/ (o .cursor/skills/, .claude/skills/, etc.)
+├── .agents/skills/ (y otras carpetas de editores)
 └── Otras estructuras de specs (docs/specs/, .skills/, etc.)
 ```
 
@@ -51,44 +51,73 @@ Clasificar en modo de init:
 | **migrate** | Existe estructura de specs diferente (ej: `docs/specs/`) | Auditar, proponer mapeo, preguntar antes de actuar |
 | **adopt** | Ya existe `openspec/` | Verificar consistencia, completar lo que falte |
 
-**Si es modo migrate**: presentar un reporte de qué se encontró vs qué espera el flujo SDD. Proponer plan de migración. PREGUNTAR al usuario antes de ejecutar.
+**Si es modo migrate**: presentar reporte de qué se encontró vs qué espera el flujo SDD. Proponer plan de migración. PREGUNTAR al usuario antes de ejecutar.
 
 ### Step 3: Configurar política de AGENTS.md
 
-Preguntar al usuario qué modo prefiere para la gestión de `AGENTS.md`:
+Preguntar al usuario qué modo prefiere:
 
-| Modo | Comportamiento | Cuándo usarlo |
-|------|---------------|---------------|
-| `managed` | El flujo controla todo el AGENTS.md | Repo nuevo, o el usuario quiere que el flujo gobierne |
-| `section` | Solo se toca la sección delimitada `<!-- sdd-workflow:start/end -->` | Repo con AGENTS.md que tiene reglas propias |
-| `readonly` | Nunca se modifica AGENTS.md — las reglas viven solo en SKILLs | El usuario no quiere que se toque su archivo |
+| Modo | Comportamiento |
+|------|---------------|
+| `managed` | El flujo controla todo el AGENTS.md |
+| `section` | Solo se toca la sección delimitada `<!-- sdd-workflow:start/end -->` |
+| `readonly` | Nunca se modifica AGENTS.md — reglas viven solo en SKILLs |
 
-Guardar la elección en `openspec/config.yaml` como `agents_md_policy`.
+### Step 4: Detectar capacidades de subagentes
 
-### Step 4: Crear/actualizar openspec/config.yaml
+Preguntar: "¿Tu editor soporta delegación a subagentes? (ej: Claude Code con delegate/task)"
 
-Usar el template en `assets/config.template.yaml` como base. Completar con:
-- Contexto del proyecto detectado en Step 1
-- Namespaces (preguntar al usuario si quiere definir algunos o dejar vacío)
-- Política de AGENTS.md elegida en Step 3
-- TDD habilitado/deshabilitado (detectar si hay test runner; preguntar preferencia)
+Guardar respuesta en config.yaml como `agent_mode: multi | sequential`.
 
-**Si `openspec/config.yaml` ya existe**: LEER el existente, comparar con el template, y proponer al usuario:
-- `mantener`: dejar el existente como está
-- `merge`: agregar campos faltantes sin tocar los existentes
-- `reemplazar`: generar uno nuevo (backup del anterior)
+Si multi-agente, preguntar qué modelos tiene disponibles y completar la tabla `model_assignments` en config.yaml con los valores que correspondan (o los defaults).
 
-### Step 5: Crear/actualizar AGENTS.md
+### Step 5: Crear/actualizar openspec/config.yaml
+
+Usar template `assets/config.template.yaml`. Completar con:
+- Contexto del proyecto (Step 1)
+- Namespaces (preguntar o dejar vacío)
+- Política de AGENTS.md (Step 3)
+- Modo de agente y modelos (Step 4)
+- TDD (detectar test runner, preguntar preferencia)
+
+**Si ya existe**: LEER, comparar, proponer `mantener` / `merge` / `reemplazar`.
+
+### Step 6: Crear/actualizar archivos de agente
+
+#### `.agents/orchestrator.md`
+- Si NO existe → copiar desde template del workflow (ya está en el repo del template)
+- Si existe → no tocar (el usuario puede haberlo personalizado)
+
+#### `.agents/personality.md`
+- Si NO existe → generar desde `assets/personality.template.md`
+- Si existe → no tocar
+- Preguntar al usuario si quiere personalizar idioma/tono
+
+#### `.agents/rules.md`
+- Si NO existe → generar desde `assets/rules.template.md`
+- Si existe → comparar con template, proponer merge si faltan reglas
+
+### Step 7: Crear/actualizar AGENTS.md
 
 Según la política elegida:
 
-**Si `managed`**: Crear `AGENTS.md` completo usando `assets/agents-section.template.md` como contenido.
+**`managed`**: Crear completo. Incluir:
+```markdown
+# AGENTS.md
 
-**Si `section`**: Si `AGENTS.md` existe, agregar la sección delimitada al final. Si no existe, crear solo con la sección delimitada.
+Leer los siguientes archivos al inicio de cada sesión:
+- [Orquestador](.agents/orchestrator.md) — protocolo de coordinación
+- [Personalidad](.agents/personality.md) — tono e idioma
+- [Reglas](.agents/rules.md) — reglas generales del proyecto
 
-**Si `readonly`**: No tocar `AGENTS.md`. Informar al usuario que las reglas viven en los SKILLs.
+{contenido de assets/agents-section.template.md}
+```
 
-### Step 6: Crear estructura de directorios
+**`section`**: Agregar sección delimitada al final del AGENTS.md existente.
+
+**`readonly`**: No tocar.
+
+### Step 8: Crear estructura de directorios
 
 ```bash
 mkdir -p openspec/specs
@@ -96,21 +125,31 @@ mkdir -p openspec/changes/archive
 mkdir -p docs
 ```
 
-### Step 7: Crear archivos de documentación
+### Step 9: Crear archivos de documentación
 
-Usando los templates de `assets/`:
-- `docs/known-issues.md` ← de `assets/known-issues.template.md`
-- `docs/workflow-changelog.md` ← de `assets/workflow-changelog.template.md`
+Desde `assets/`:
+- `docs/known-issues.md` (si no existe)
+- `docs/workflow-changelog.md` (si no existe)
 
-**Si alguno ya existe**: NO sobrescribir. Informar que ya existe.
+### Step 10: Detectar skills de proyecto existentes
 
-### Step 8: Detectar editores y ofrecer mirrors
+Escanear directorios de skills buscando skills NO-SDD:
 
-Preguntar al usuario qué editores/agentes usa. Ofrecer generar copias de `.agents/` para cada editor.
+```
+Para cada skill en .agents/skills/, .claude/skills/, .cursor/skills/:
+├── Si name NO empieza con "sdd-" Y NO es "_shared" Y NO es "domain-brief"
+│   └── Registrar: name, description, tipo inferido
+└── Reportar al usuario qué skills de proyecto se detectaron
+```
 
-Si el usuario acepta, ejecutar el script `scripts/mirror-agents.sh` con los editores seleccionados, o generar las copias manualmente si el script no está disponible.
+Si no se encontraron y el stack lo sugiere, proponer crear:
+"Detecté que usás {Laravel/React/etc}. ¿Querés que cree una skill con las convenciones?"
 
-### Step 9: Retornar resumen
+### Step 11: Detectar editores y ofrecer mirrors
+
+Preguntar qué editores usa. Ejecutar `scripts/mirror-agents.sh` si acepta.
+
+### Step 12: Retornar resumen
 
 ```markdown
 ## SDD Inicializado
@@ -119,18 +158,32 @@ Si el usuario acepta, ejecutar el script `scripts/mirror-agents.sh` con los edit
 **Stack**: {stack detectado}
 **Modo init**: {fresh | migrate | adopt}
 **AGENTS.md policy**: {managed | section | readonly}
+**Agent mode**: {multi | sequential}
 **TDD**: {habilitado | deshabilitado | no disponible}
 
-### Estructura Creada/Verificada
+### Archivos de Agente
+- .agents/orchestrator.md {✅ creado | ℹ️ existente}
+- .agents/personality.md {✅ creado | ℹ️ existente}
+- .agents/rules.md {✅ creado | ℹ️ existente}
+- AGENTS.md {✅ creado | ✅ sección agregada | ⏭️ readonly}
+
+### Estructura OpenSpec
 - openspec/config.yaml {✅ creado | ✅ actualizado | ℹ️ existente}
 - openspec/specs/ {✅ creado | ℹ️ existente}
 - openspec/changes/ {✅ creado | ℹ️ existente}
-- AGENTS.md {✅ creado | ✅ sección agregada | ⏭️ readonly}
+
+### Documentación
 - docs/known-issues.md {✅ creado | ℹ️ existente}
 - docs/workflow-changelog.md {✅ creado | ℹ️ existente}
 
+### Skills de Proyecto Detectadas
+{lista o "Ninguna — considerar crear skills para {stack}"}
+
+### Modelos Configurados
+{tabla de asignación o "Modo secuencial — tabla no aplica"}
+
 ### Siguiente paso
-Ejecutar `/opsx:explore <tema>` o `/opsx:propose <change-name>`.
+Ejecutar `/opsx:onboard` para tutorial, o `/opsx:new <nombre>` para tu primer change.
 ```
 
 ## Rules
@@ -140,4 +193,6 @@ Ejecutar `/opsx:explore <tema>` o `/opsx:propose <change-name>`.
 - Si hay estructura existente, AUDITAR y PREGUNTAR antes de modificar
 - Mantener context en config.yaml CONCISO — máximo 10 líneas
 - Si el proyecto tiene un `docs/` con contenido propio, NO borrar nada
+- SIEMPRE preguntar por capacidades de subagentes — no asumir
+- Si el usuario no sabe si su editor soporta subagentes, default a sequential
 - Sobre de retorno según **Sección F** de `_shared/phase-common.md`

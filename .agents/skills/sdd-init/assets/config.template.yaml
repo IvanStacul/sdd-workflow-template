@@ -14,6 +14,26 @@ context: |
 # Política de AGENTS.md: managed | section | readonly
 agents_md_policy: section
 
+# Modo de agente: multi | sequential
+agent_mode: sequential
+
+# Asignación de modelos (solo aplica si agent_mode: multi)
+# Los nombres son aliases — mapear al modelo real disponible
+model_assignments:
+  orchestrator: opus      # Coordina y toma decisiones
+  sdd-explore: sonnet     # Lectura estructural
+  sdd-propose: opus       # Decisiones de alcance
+  sdd-spec: sonnet        # Redacción estructurada
+  sdd-design: opus        # Decisiones arquitectónicas
+  sdd-tasks: sonnet       # Descomposición mecánica
+  sdd-apply: sonnet       # Implementación
+  sdd-verify: sonnet      # Verificación
+  sdd-archive: haiku      # Copiar y cerrar
+  default: sonnet         # Delegación general
+
+# Modo de interacción default: interactive | auto
+interaction_mode: interactive
+
 # Namespaces (metadata de specs, no carpetas)
 namespaces: []
 # Ejemplo:
@@ -25,8 +45,7 @@ namespaces: []
 tdd: false
 # test_command: ""
 
-# Overrides por fase (solo lo que difiere de los defaults del SKILL)
-# Las reglas completas viven en cada SKILL.md
+# Overrides por fase
 rules:
   spec:
     - Incluir sección de Casos de Borde (obligatoria)

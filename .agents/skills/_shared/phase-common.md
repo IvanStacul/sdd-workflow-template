@@ -11,10 +11,12 @@ Cada agente de fase SDD es un EJECUTOR, no un coordinador. Realiza el trabajo de
 Antes de cualquier acción, lee en este orden:
 
 1. `openspec/config.yaml` → contexto del proyecto, reglas de la fase, namespaces, política de `agents_md_policy`
-2. `AGENTS.md` → reglas globales del proyecto (si existe)
+2. `.agents/rules.md` → reglas generales del proyecto
 3. Si hay change activo → `state.md` del change (log de fases, decisiones previas, archivos afectados)
-4. Artefactos previos del change según la tabla de dependencias de la fase
+4. Artefactos previos del change según la tabla de dependencias de la fase (ver orchestrator.md)
 5. `docs/known-issues.md` → bugs conocidos y lecciones relevantes (si existe)
+
+Si se recibió un bloque `## Project Standards (auto-resolved)` del orquestador, seguir esas reglas — son skills de proyecto ya procesadas. NO leer archivos SKILL.md de otras skills.
 
 Si un archivo no existe, continúa sin él — no es un error, es un proyecto que aún no llegó a esa fase.
 
@@ -77,7 +79,7 @@ Cada fase que genere un artefacto DEBE escribirlo en el path dentro de `openspec
 
 ## F. Sobre de Retorno
 
-Cada fase DEBE devolver un resumen estructurado:
+Cada fase DEBE devolver un resumen estructurado al orquestador (o al usuario si es modo secuencial):
 
 ```markdown
 **Estado**: {success | partial | blocked}
@@ -85,4 +87,12 @@ Cada fase DEBE devolver un resumen estructurado:
 **Artefactos**: {lista de archivos escritos}
 **Siguiente**: {fase recomendada o "ninguna"}
 **Riesgos**: {riesgos detectados o "Ninguno"}
+**Skill Resolution**: {injected | none | fallback}
 ```
+
+Valores de `Skill Resolution`:
+- `injected` — se recibieron Project Standards del orquestador y se siguieron
+- `none` — no se recibieron ni se encontraron skills de proyecto (normal)
+- `fallback` — se intentó cargar skills manualmente porque no se recibieron del orquestador
+
+Si el orquestador recibe `fallback`, debe re-escanear skills de proyecto y reinjectarlas en futuras delegaciones.
