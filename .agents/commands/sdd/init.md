@@ -1,6 +1,6 @@
 ---
-name: "OPSX: Init"
-description: "Inicializar el flujo SDD en el proyecto"
+name: "SDD: Init"
+description: "Inicializar el workflow SDD en el proyecto"
 ---
 
 Inicializar Spec-Driven Development en este proyecto.

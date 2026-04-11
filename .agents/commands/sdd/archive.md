@@ -1,5 +1,5 @@
 ---
-name: "OPSX: Archive"
+name: "SDD: Archive"
 description: "Archivar un change completado con retro obligatoria"
 ---
 

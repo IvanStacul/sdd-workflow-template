@@ -1,4 +1,4 @@
-# openspec/config.yaml — Generado por sdd-init
+﻿﻿# openspec/config.yaml - Generado por sdd-init
 schema: spec-driven
 
 context: |
@@ -11,39 +11,58 @@ context: |
   ## Convenciones
   - Código en inglés, specs y documentación en español
 
-# Política de AGENTS.md: managed | section | readonly
+# Política de AGENTS.md:
+# - managed: el workflow controla todo el archivo
+# - section: solo maneja el bloque sdd-workflow delimitado
+# - readonly: nunca toca AGENTS.md
 agents_md_policy: section
 
-# Modo de agente: multi | sequential
+# Modo de agente:
+# - sequential: todas las fases en una misma conversación
+# - multi: el orquestador puede delegar fases si el editor lo soporta
 agent_mode: sequential
 
-# Asignación de modelos (solo aplica si agent_mode: multi)
-# Los nombres son aliases — mapear al modelo real disponible
+# Asignación de modelos por fase.
+# Importa sobre todo cuando agent_mode: multi y/o modules.model_routing: true.
+# Los nombres son aliases; mapear al modelo real disponible.
 model_assignments:
-  orchestrator: opus      # Coordina y toma decisiones
-  sdd-explore: sonnet     # Lectura estructural
-  sdd-propose: opus       # Decisiones de alcance
-  sdd-spec: sonnet        # Redacción estructurada
-  sdd-design: opus        # Decisiones arquitectónicas
-  sdd-tasks: sonnet       # Descomposición mecánica
-  sdd-apply: sonnet       # Implementación
-  sdd-verify: sonnet      # Verificación
-  sdd-archive: haiku      # Copiar y cerrar
-  default: sonnet         # Delegación general
+  orchestrator: opus
+  sdd-explore: sonnet
+  sdd-propose: opus
+  sdd-spec: sonnet
+  sdd-design: opus
+  sdd-tasks: sonnet
+  sdd-apply: sonnet
+  sdd-verify: sonnet
+  sdd-archive: haiku
+  default: sonnet
 
-# Modo de interacción default: interactive | auto
+# Modo de interacción:
+# - interactive: pausa en decisiones relevantes
+# - auto: avanza con menos confirmaciones
 interaction_mode: interactive
 
-# Namespaces (metadata de specs, no carpetas)
+# Namespaces: metadata de specs, no carpetas.
 namespaces: []
 # Ejemplo:
 # - id: inventory
 #   label: Inventario
-#   description: Productos, variantes, stock
+#   description: Productos, variantes y stock
 
-# TDD
-tdd: false
-# test_command: ""
+# Testing detectado durante init.
+# strict_tdd solo tiene sentido si existe un test runner funcional.
+testing:
+  strict_tdd: false
+  test_command: ""
+  coverage_command: ""
+  typecheck_command: ""
+
+# Modulos opcionales del workflow.
+# skill_registry: detecta e inyecta skills de proyecto en fases relevantes.
+# model_routing: usa model_assignments para elegir modelo segun la fase.
+modules:
+  skill_registry: true
+  model_routing: false
 
 # Overrides por fase
 rules:

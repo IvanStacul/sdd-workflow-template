@@ -1,7 +1,7 @@
-# Tareas — {Nombre del Change}
+﻿﻿# Tareas - {Nombre del Change}
 
 > **Specs**: [specs/](./specs/)
-> **Design**: [design.md](./design.md)
+> **Design**: [design.md](./design.md) _(si existe; si no, borrar esta linea)_
 
 ## Convenciones
 
@@ -10,11 +10,11 @@
 
 ---
 
-## PHASE 1 — {Nombre}
+## PHASE 1 - {Nombre}
 
 - [ ] 1.1 {Descripción} `[REQ-XX]`
   - **Archivos**: `path/to/file`
-  - **Depende de**: —
+  - **Depende de**: -
   - **Criterio**: {verificable}
 
 - [ ] 1.2 {Descripción} `[REQ-XX]`
@@ -24,7 +24,7 @@
 
 ---
 
-## PHASE 2 — {Nombre}
+## PHASE 2 - {Nombre}
 
 - [ ] 2.1 {Descripción} `[REQ-XX]`
   - **Archivos**: `path/to/file`

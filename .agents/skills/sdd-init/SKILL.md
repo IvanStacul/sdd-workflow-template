@@ -1,198 +1,331 @@
----
+﻿---
 name: sdd-init
 description: >
-  Inicializar el flujo SDD en un proyecto. Detecta stack, estructura existente,
-  y genera config.yaml, AGENTS.md, personality.md, rules.md, y estructura de documentación.
-  Trigger: Cuando el usuario ejecuta /opsx:init o quiere iniciar el flujo SDD
-  en un proyecto, o dice "sdd init", "iniciar sdd" u "openspec init".
+  Inicializar el workflow SDD en un proyecto y escribir la configuración file-based.
+  Trigger: Cuando el usuario ejecuta /sdd:init, quiere iniciar el flujo SDD en un proyecto, o dice "sdd init", "iniciar sdd" u "openspec init". O cuando el orquestador detecta que falta openspec/config.yaml.
 metadata:
-  version: "1.1"
+  version: "2.0"
 ---
 
 ## Purpose
 
-Inicializar el contexto SDD (Spec-Driven Development) en un proyecto. Detectar el stack técnico, evaluar la estructura existente, configurar archivos de agente, y generar la estructura de documentación.
+Inicializar el contexto SDD (Spec-Driven Development) del proyecto, detectar stack técnico y de testing, evaluar la estructura existente, configurar archivos de agente, y dejar la estructura file-based lista para trabajar sin adivinar decisiones importantes.
 
-Sos un EJECUTOR — hacé el trabajo directamente. NO lances subagentes.
+Sos un EJECUTOR - hacé el trabajo directamente. NO lances subagentes.
 
-## What to Do
+## Inputs
 
-### Step 1: Detectar contexto del proyecto
+- Raiz del proyecto actual.
+- Opcionalmente: preferencias explícitas del usuario para políticas, modos o módulos.
 
-Leer el proyecto para entender:
-- Tech stack (package.json, composer.json, go.mod, pyproject.toml, etc.)
-- Convenciones existentes (linters, formatters, test frameworks)
-- Patrones de arquitectura en uso
-- Test runner y comando (detectar si TDD es viable)
+## Context Load
 
-### Step 2: Detectar estructura existente
+Leer en este orden:
 
-```
+1. `AGENTS.md`, `CLAUDE.md`, `.cursorrules` u otros archivos de reglas si existen.
+2. `.agents/orchestrator.md`, `.agents/personality.md`, `.agents/rules.md` si existen.
+3. `openspec/config.yaml` si existe.
+4. Estructura actual del repo para detectar stack, tests, skills y documentacion.
+
+Compatibilidad legacy:
+
+- Si existe `tdd`, mapearlo a `testing.strict_tdd`.
+- Si existe `test_command`, mapearlo a `testing.test_command`.
+
+## Steps
+
+### Step 1: Detectar contexto real del proyecto
+
+Inspeccionar el proyecto para detectar:
+
+- stack técnico (lenguajes, frameworks, herramientas de build)
+- linters y formatters
+- patrones de arquitectura ya en uso
+- test runner
+- coverage command
+- typecheck command
+
+El objetivo de este paso es que el init se apoye en evidencia real del repo. No inventar stack, comandos ni capacidades.
+
+### Step 2: Detectar estructura existente y clasificar el init
+
 Verificar existencia de:
-├── AGENTS.md (o equivalentes: CLAUDE.md, .cursorrules, etc.)
-├── .agents/orchestrator.md, personality.md, rules.md
-├── openspec/
-│   ├── config.yaml
-│   ├── specs/
-│   └── changes/
-├── docs/
-│   ├── known-issues.md
-│   ├── workflow-changelog.md
-│   └── domain-brief.md
-├── .agents/skills/ (y otras carpetas de editores)
-└── Otras estructuras de specs (docs/specs/, .skills/, etc.)
-```
 
-Clasificar en modo de init:
+- `AGENTS.md` o equivalentes (`CLAUDE.md`, `.cursorrules`, etc.)
+- `.agents/orchestrator.md`, `.agents/personality.md`, `.agents/rules.md`
+- `openspec/config.yaml`
+- `openspec/specs/`
+- `openspec/changes/`
+- `docs/known-issues.md`
+- `docs/workflow-changelog.md`
+- otras estructuras de specs o skills (`docs/specs/`, `.agents/skills/`, `.claude/skills/`, etc.)
 
-| Modo | Condición | Acción |
+Clasificar en:
+
+| Modo | Condicion | Accion |
 |------|-----------|--------|
 | **fresh** | No existe `openspec/` ni estructura de specs | Crear todo desde cero |
-| **migrate** | Existe estructura de specs diferente (ej: `docs/specs/`) | Auditar, proponer mapeo, preguntar antes de actuar |
-| **adopt** | Ya existe `openspec/` | Verificar consistencia, completar lo que falte |
+| **migrate** | Existe estructura de specs diferente (ej: `docs/specs/`) | Auditar, proponer mapeo y preguntar antes de actuar |
+| **adopt** | Ya existe `openspec/` | Verificar consistencia y completar lo que falte |
 
-**Si es modo migrate**: presentar reporte de qué se encontró vs qué espera el flujo SDD. Proponer plan de migración. PREGUNTAR al usuario antes de ejecutar.
+**Si es modo migrate**: presentar reporte de que se encontro vs que espera el flujo SDD. Proponer plan de migracion. PREGUNTAR al usuario antes de ejecutar.
 
-### Step 3: Configurar política de AGENTS.md
+### Step 3: Resolver decisiones de configuracion ANTES de escribir nada
 
-Preguntar al usuario qué modo prefiere:
+Antes de escribir `openspec/config.yaml`, explicar cada decision en el momento en que aparece. La persona que lee esta skill no deberia tener que saltar a otra seccion para entender que significa cada opcion.
 
-| Modo | Comportamiento |
-|------|---------------|
-| `managed` | El flujo controla todo el AGENTS.md |
-| `section` | Solo se toca la sección delimitada `<!-- sdd-workflow:start/end -->` |
-| `readonly` | Nunca se modifica AGENTS.md — reglas viven solo en SKILLs |
+Usar defaults solo si:
 
-### Step 4: Detectar capacidades de subagentes
+- el usuario no dio preferencia,
+- el estado del repo no obliga otra cosa,
+- y la recomendacion es razonable para un proyecto generico.
 
-Preguntar: "¿Tu editor soporta delegación a subagentes? (ej: Claude Code con delegate/task)"
+Para detalle estructural del archivo, ver `_shared/openspec-convention.md`.
+Para el modulo de skills de proyecto, ver `_shared/skill-resolver.md`.
 
-Guardar respuesta en config.yaml como `agent_mode: multi | sequential`.
+#### 3.1 `agents_md_policy`
 
-Si multi-agente, preguntar qué modelos tiene disponibles y completar la tabla `model_assignments` en config.yaml con los valores que correspondan (o los defaults).
+Controla como se gestiona `AGENTS.md`.
 
-### Step 5: Crear/actualizar openspec/config.yaml
+| Opcion | Que hace | Cuando conviene |
+|--------|----------|-----------------|
+| `managed` | El workflow controla todo el archivo | Repos nuevos o cuando el usuario quiere centralizar todo en SDD |
+| `section` | Solo toca la seccion delimitada `<!-- sdd-workflow:start/end -->` | Repos donde `AGENTS.md` ya tiene contenido propio o puede crecer con otras reglas |
+| `readonly` | Nunca modifica `AGENTS.md` | Repos donde `AGENTS.md` lo mantiene otra herramienta o el usuario no quiere automatizarlo |
 
-Usar template `assets/config.template.yaml`. Completar con:
-- Contexto del proyecto (Step 1)
-- Namespaces (preguntar o dejar vacío)
-- Política de AGENTS.md (Step 3)
-- Modo de agente y modelos (Step 4)
-- TDD (detectar test runner, preguntar preferencia)
+Recomendacion: `section`.
 
-**Si ya existe**: LEER, comparar, proponer `mantener` / `merge` / `reemplazar`.
+Motivo: da una integracion clara sin apropiarse del archivo completo y evita mezclar reglas del workflow con otras reglas del proyecto.
 
-### Step 6: Crear/actualizar archivos de agente
+#### 3.2 `agent_mode`
+
+Controla como se ejecutan las fases.
+
+| Opcion | Que hace | Implicancia |
+|--------|----------|-------------|
+| `sequential` | El orquestador ejecuta todas las fases en la misma conversacion | Funciona en cualquier editor; es el default seguro |
+| `multi` | El orquestador puede delegar fases a subagentes | Solo sirve si el editor realmente soporta delegacion |
+
+Preguntar si el editor soporta delegacion a subagentes. Si el usuario no sabe o el editor no lo soporta, usar `sequential`.
+
+Si se elige `multi`, completar `model_assignments` con los aliases disponibles o preservar los ya configurados.
+
+Recomendacion: `sequential`, salvo que el usuario confirme soporte real de subagentes y quiera usarlo.
+
+#### 3.3 `interaction_mode`
+
+Controla cuanta confirmacion pide el flujo.
+
+| Opcion | Que hace | Cuando conviene |
+|--------|----------|-----------------|
+| `interactive` | Pausa en decisiones importantes y deja visible el avance | Cuando se esta adoptando el workflow o se prioriza control |
+| `auto` | Ejecuta mas seguido de punta a punta con menos pausas | Cuando el equipo ya confia en el flujo y quiere velocidad |
+
+Recomendacion: `interactive`.
+
+#### 3.4 `namespaces`
+
+Los namespaces son metadata de specs, no carpetas. Sirven para separar dominios funcionales grandes.
+
+| Opcion | Que hace |
+|--------|----------|
+| `[]` | No usar namespaces por ahora |
+| Lista de namespaces | Etiquetar specs por dominio (`inventory`, `billing`, etc.) |
+
+Recomendacion: dejar `[]` al iniciar, salvo que el proyecto ya tenga dominios bien definidos y estables.
+
+#### 3.5 `testing.strict_tdd`
+
+Controla si `sdd-apply` y `sdd-verify` deben cargar reglas de TDD estricto.
+
+| Opcion | Que hace | Implicancia |
+|--------|----------|-------------|
+| `false` | Permite implementar sin forzar ciclo test-first estricto | Default seguro cuando el equipo no trabaja con TDD estricto |
+| `true` | Activa reglas extra para escribir o ajustar tests antes del codigo | Requiere test runner real y acuerdo del equipo |
+
+Recomendacion: `false` por default. Solo activar si el proyecto tiene test runner y el usuario o la configuracion existente piden TDD estricto.
+
+Ademas de esta bandera, detectar:
+
+- `testing.test_command`
+- `testing.coverage_command`
+- `testing.typecheck_command`
+
+Si el proyecto no tiene test runner, dejar los campos vacios y explicarlo.
+
+#### 3.6 `modules.skill_registry`
+
+Controla si el flujo detecta skills de proyecto y las inyecta en fases relevantes.
+
+| Opcion | Que hace | Implicancia |
+|--------|----------|-------------|
+| `false` | El flujo usa solo reglas SDD base | Menos integracion con convenciones del proyecto |
+| `true` | Activa el resolver de skills de proyecto | Las fases tecnicas pueden recibir estandares compactados automaticamente |
+
+Recomendacion: `true`.
+
+Motivo: mejora la consistencia entre fases y ayuda a que `design`, `tasks`, `apply` y `verify` sepan que convenciones o herramientas existen en el repo.
+
+#### 3.7 `modules.model_routing`
+
+Controla si se usan modelos distintos por fase.
+
+| Opcion | Que hace | Implicancia |
+|--------|----------|-------------|
+| `false` | Ignora routing por fase | Menos complejidad; default seguro |
+| `true` | Usa `model_assignments` para elegir modelo segun la fase | Solo tiene sentido real si `agent_mode: multi` |
+
+Recomendacion: `false`, salvo que el editor soporte delegacion y el equipo quiera administrar modelos por fase.
+
+#### 3.8 Defaults recomendados
+
+Si no hay preferencias explicitas ni restricciones del repo, usar:
+
+- `agents_md_policy: section`
+- `agent_mode: sequential`
+- `interaction_mode: interactive`
+- `namespaces: []`
+- `testing.strict_tdd: false`
+- `modules.skill_registry: true`
+- `modules.model_routing: false`
+
+Si ya existe config, preservar valores explicitos y migrar solo la forma del bloque `testing`.
+
+### Step 4: Crear o actualizar `openspec/config.yaml`
+
+Usar `assets/config.template.yaml`.
+
+Completar con:
+
+- contexto del proyecto detectado en Step 1
+- politica de `AGENTS.md`
+- modo de agente e interaccion
+- `model_assignments`
+- `namespaces`
+- `testing.strict_tdd`
+- `testing.test_command`
+- `testing.coverage_command`
+- `testing.typecheck_command`
+- `modules.skill_registry`
+- `modules.model_routing`
+- `rules.<fase>` si el proyecto ya tiene overrides claros
+
+Si `openspec/config.yaml` ya existe:
+
+- LEER antes de tocar.
+- Preservar valores explicitos del usuario.
+- Migrar `tdd` y `test_command` a `testing.*`.
+- Si el archivo requiere un cambio estructural fuerte, proponer `mantener` / `merge` / `reemplazar` antes de hacerlo.
+
+No volver a escribir claves legacy en raiz.
+
+### Step 5: Crear o actualizar archivos base del agente
 
 #### `.agents/orchestrator.md`
-- Si NO existe → copiar desde template del workflow (ya está en el repo del template)
-- Si existe → no tocar (el usuario puede haberlo personalizado)
+
+- Si NO existe -> copiar desde el workflow template.
+- Si existe -> no pisarlo silenciosamente; comparar y proponer merge si le faltan reglas base importantes.
 
 #### `.agents/personality.md`
-- Si NO existe → generar desde `assets/personality.template.md`
-- Si existe → no tocar
-- Preguntar al usuario si quiere personalizar idioma/tono
+
+- Si NO existe -> crear desde el workflow template.
+- Si existe -> preservar la voz del proyecto y solo proponer merge si faltan pautas esenciales.
 
 #### `.agents/rules.md`
-- Si NO existe → generar desde `assets/rules.template.md`
-- Si existe → comparar con template, proponer merge si faltan reglas
 
-### Step 7: Crear/actualizar AGENTS.md
+- Si NO existe -> crear desde el workflow template.
+- Si existe -> preservar reglas propias del proyecto y agregar solo guardrails SDD faltantes.
 
-Según la política elegida:
+### Step 6: Crear o actualizar `AGENTS.md` segun la policy elegida
 
-**`managed`**: Crear completo. Incluir:
-```markdown
-# AGENTS.md
+Usar `assets/agents-section.template.md` cuando haga falta escribir la seccion SDD.
 
-Leer los siguientes archivos al inicio de cada sesión:
-- [Orquestador](.agents/orchestrator.md) — protocolo de coordinación
-- [Personalidad](.agents/personality.md) — tono e idioma
-- [Reglas](.agents/rules.md) — reglas generales del proyecto
+| Policy | Accion |
+|--------|--------|
+| `managed` | Crear o reemplazar el archivo completo. Usar solo si el usuario quiere que el workflow lo administre entero. |
+| `section` | Crear el archivo si no existe, o insertar/actualizar solo el bloque delimitado `<!-- sdd-workflow:start/end -->`. Preservar el resto. |
+| `readonly` | No tocar `AGENTS.md`. Asegurar que `.agents/` quede documentado y mencionar que el usuario debe enlazarlo manualmente si quiere. |
 
-{contenido de assets/agents-section.template.md}
-```
+Si el usuario elige `readonly`, asegurarse de que las reglas del workflow sigan estando claras en `.agents/` y que no haya contradicciones obvias con `AGENTS.md`.
 
-**`section`**: Agregar sección delimitada al final del AGENTS.md existente.
+### Step 7: Asegurar estructura y documentacion base
 
-**`readonly`**: No tocar.
+Crear si falta:
 
-### Step 8: Crear estructura de directorios
+- `openspec/specs/`
+- `openspec/changes/archive/`
+- `docs/`
 
-```bash
-mkdir -p openspec/specs
-mkdir -p openspec/changes/archive
-mkdir -p docs
-```
+Crear si faltan, usando los templates de `assets/`:
 
-### Step 9: Crear archivos de documentación
+- `docs/known-issues.md` desde `assets/known-issues.template.md`
+- `docs/workflow-changelog.md` desde `assets/workflow-changelog.template.md`
 
-Desde `assets/`:
-- `docs/known-issues.md` (si no existe)
-- `docs/workflow-changelog.md` (si no existe)
+No crear specs placeholder.
+No crear `docs/domain-brief.md` vacio; ese archivo se genera con `domain-brief` cuando ya existen specs consolidadas.
 
-### Step 10: Detectar skills de proyecto existentes
+### Step 8: Detectar skills de proyecto y mirrors opcionales
 
-Escanear directorios de skills buscando skills NO-SDD:
+Si `modules.skill_registry: true`, escanear skills de proyecto existentes:
 
-```
-Para cada skill en .agents/skills/, .claude/skills/, .cursor/skills/:
-├── Si name NO empieza con "sdd-" Y NO es "_shared" Y NO es "domain-brief"
-│   └── Registrar: name, description, tipo inferido
-└── Reportar al usuario qué skills de proyecto se detectaron
-```
+- incluir skills locales que NO empiecen con `sdd-`
+- excluir `_shared`
+- excluir `domain-brief`
+- reportar al usuario cuales se detectaron y de que tipo parecen ser
 
-Si no se encontraron y el stack lo sugiere, proponer crear:
-"Detecté que usás {Laravel/React/etc}. ¿Querés que cree una skill con las convenciones?"
+Si no se encontraron y el stack sugiere que convendria una skill de proyecto, proponer crearla mas adelante.
 
-### Step 11: Detectar editores y ofrecer mirrors
+Si el usuario trabaja en varios editores, ofrecer `scripts/mirror-agents.sh` como paso opcional.
 
-Preguntar qué editores usa. Ejecutar `scripts/mirror-agents.sh` si acepta.
+### Step 9: Retornar resumen claro
 
-### Step 12: Retornar resumen
+El resumen final debe dejar visible:
 
-```markdown
-## SDD Inicializado
+- stack detectado
+- modo de init (`fresh`, `migrate`, `adopt`)
+- decisiones de configuracion tomadas
+- archivos creados, preservados o fusionados
+- skills de proyecto detectadas
+- siguiente paso recomendado (`/sdd:onboard` o `/sdd:new <nombre>`)
 
-**Proyecto**: {nombre}
-**Stack**: {stack detectado}
-**Modo init**: {fresh | migrate | adopt}
-**AGENTS.md policy**: {managed | section | readonly}
-**Agent mode**: {multi | sequential}
-**TDD**: {habilitado | deshabilitado | no disponible}
+## Persistence
 
-### Archivos de Agente
-- .agents/orchestrator.md {✅ creado | ℹ️ existente}
-- .agents/personality.md {✅ creado | ℹ️ existente}
-- .agents/rules.md {✅ creado | ℹ️ existente}
-- AGENTS.md {✅ creado | ✅ sección agregada | ⏭️ readonly}
+Escribir o actualizar:
 
-### Estructura OpenSpec
-- openspec/config.yaml {✅ creado | ✅ actualizado | ℹ️ existente}
-- openspec/specs/ {✅ creado | ℹ️ existente}
-- openspec/changes/ {✅ creado | ℹ️ existente}
+- `openspec/config.yaml`
+- `openspec/specs/`
+- `openspec/changes/archive/`
+- `docs/known-issues.md`
+- `docs/workflow-changelog.md`
+- `AGENTS.md` segun policy
 
-### Documentación
-- docs/known-issues.md {✅ creado | ℹ️ existente}
-- docs/workflow-changelog.md {✅ creado | ℹ️ existente}
+## Return Envelope
 
-### Skills de Proyecto Detectadas
-{lista o "Ninguna — considerar crear skills para {stack}"}
-
-### Modelos Configurados
-{tabla de asignación o "Modo secuencial — tabla no aplica"}
-
-### Siguiente paso
-Ejecutar `/opsx:onboard` para tutorial, o `/opsx:new <nombre>` para tu primer change.
+```yaml
+status: success | partial | blocked
+summary: ""
+artifacts:
+  - openspec/config.yaml
+next: "/sdd:new <nombre> o /sdd:onboard"
+risks:
+  - ""
+skill_resolution: disabled
 ```
 
 ## Rules
 
-- NUNCA crear specs placeholder — las specs se crean con sdd-spec
-- SIEMPRE detectar el stack real, no adivinar
-- Si hay estructura existente, AUDITAR y PREGUNTAR antes de modificar
-- Mantener context en config.yaml CONCISO — máximo 10 líneas
-- Si el proyecto tiene un `docs/` con contenido propio, NO borrar nada
-- SIEMPRE preguntar por capacidades de subagentes — no asumir
-- Si el usuario no sabe si su editor soporta subagentes, default a sequential
-- Sobre de retorno según **Sección F** de `_shared/phase-common.md`
+- Nunca crear specs placeholder.
+- SIEMPRE detectar el stack real, no inventar.
+- Si hay estructura existente, AUDITAR y PREGUNTAR antes de modificar.
+- Explicar cada decision de configuracion en el momento en que se presenta.
+- Usar los templates de `assets/` cuando exista un artefacto canonico para ese archivo.
+- Escribir solo la nueva forma `testing.*`.
+- Si no hay test runner, dejar `testing.*` vacio y explicarlo.
+- No borrar documentacion existente del proyecto.
+- No pisar archivos personalizados del usuario sin comparar y proponer merge.
+
+## Optional Modules
+
+- `testing.strict_tdd`: si esta en `true`, `sdd-apply` y `sdd-verify` cargan reglas adicionales de TDD estricto.
+- `modules.skill_registry`: default recomendado `true`; habilita deteccion e inyeccion de skills de proyecto segun `_shared/skill-resolver.md`.
+- `modules.model_routing`: solo tiene efecto cuando `agent_mode: multi`.

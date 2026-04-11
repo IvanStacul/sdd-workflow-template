@@ -1,95 +1,141 @@
----
+﻿﻿---
 name: sdd-apply
 description: >
-  Implementar tareas del plan de trabajo, marcando progreso en tasks.md.
-  Trigger: Cuando el usuario quiere implementar tareas de un change.
+  Implementar tareas de un change leyendo specs como fuente de verdad y usando tasks.md como continuidad entre lotes.
+  Trigger: Cuando el usuario ejecuta /sdd:apply o cuando el orquestador lanza implementacion.
 metadata:
-  version: "1.0"
+  version: "2.0"
 ---
 
 ## Purpose
 
-Implementar las tareas pendientes del plan de trabajo. Leer specs como fuente de verdad de QUÉ, design como guía de CÓMO, y marcar cada tarea como completada.
+Implementar las tareas pendientes del change respetando specs, design, reglas del proyecto y el plan definido en `tasks.md`.
 
-Sos un EJECUTOR — implementá el código directamente. NO lances subagentes.
+`tasks.md` y `state.md` son la continuidad oficial entre lotes. Esta fase no depende de memoria conversacional: tiene que poder retomarse solo leyendo esos archivos.
 
-## What You Receive
+Sos un EJECUTOR - implementá el código directamente. NO lances subagentes.
 
-- Nombre del change
-- Opcionalmente: tareas específicas a implementar (ej: "tareas 2.1 y 2.2")
+## Inputs
 
-## What to Do
+- Nombre del change.
+- Opcionalmente, tareas específicas a implementar (por ejemplo `1.2` y `2.1`) o un lote puntual.
 
-### Step 1: Cargar contexto
+## Context Load
 
-Seguir **Sección B** de `_shared/phase-common.md`.
+Seguir `_shared/phase-common.md`.
+
+En la práctica, eso implica leer config, reglas generales, `state.md` del change y devolver el envelope común al final.
 
 Leer OBLIGATORIAMENTE:
-- `openspec/changes/{change-name}/tasks.md` — el plan de trabajo
-- `openspec/changes/{change-name}/specs/` — las specs (fuente de verdad de comportamiento)
-- `openspec/changes/{change-name}/design.md` (si existe)
-- `docs/known-issues.md` — verificar bugs conocidos relevantes
 
-Consultar:
-- `_shared/abstraction-guide.md` — antes de crear archivos/funciones
+- `openspec/changes/{change-name}/tasks.md` - el plan de trabajo
+- `openspec/changes/{change-name}/specs/` - la fuente de verdad del comportamiento del change
+- `openspec/changes/{change-name}/design.md` si existe
+- `openspec/changes/{change-name}/state.md`
+- `docs/known-issues.md` si existe - para evitar repetir bugs ya conocidos
+- `_shared/abstraction-guide.md`
 
-### Step 2: Seleccionar tareas
+Si `openspec/config.yaml` define `rules.apply`, tratarlas como reglas locales de esta fase. Pueden agregar restricciones de implementacion, quality gates o formas de registrar evidencia; complementan esta skill, no la reemplazan.
 
-Si el usuario especificó tareas → usar esas.
-Si no → tomar las siguientes tareas pendientes `[ ]` cuyas dependencias estén completadas `[x]`.
+## Steps
 
-### Step 3: Implementar
+### Step 1: Resolver el lote
 
-Para cada tarea:
+Si el usuario especificó tareas, usar exactamente esas tareas.
 
-1. Leer el requirement referenciado en la spec
-2. Leer los archivos listados en la tarea (si ya existen)
-3. Implementar siguiendo la spec y el design
-4. Verificar que el criterio de la tarea se cumple
+Si no especificó tareas, tomar las primeras tareas pendientes `- [ ]` cuyas dependencias ya estén completadas `- [x]`.
 
-**Si TDD está habilitado** (`openspec/config.yaml` → `tdd: true`):
-1. Escribir test que falla primero
-2. Implementar código mínimo para que pase
-3. Refactorizar si es necesario
+La continuidad entre lotes se resuelve SOLO con:
 
-### Step 4: Marcar progreso
+- `tasks.md` para saber que ya está hecho, que está pendiente y que está bloqueado
+- `state.md` para entender decisiones, archivos afectados y contexto acumulado
 
-En `tasks.md`, cambiar `[ ]` por `[x]` para cada tarea completada.
+No inventes un lote nuevo ignorando dependencias ni empieces por tareas marcadas `[~]` sin entender antes por qué quedaron bloqueadas.
 
-### Step 5: Persistir
+### Step 2: Resolver modo de testing
 
-Seguir **Sección C** de `_shared/phase-common.md`.
+Leer desde config:
 
-IMPORTANTE: registrar cada archivo creado/modificado en la tabla "Archivos Afectados" de `state.md` con el requirement que implementa.
+- `testing.strict_tdd`
+- `testing.test_command`
 
-### Step 6: Retornar resumen
+Usar fallback legacy solo si faltan esas claves:
 
-```markdown
-## Tareas Implementadas
+- `tdd`
+- `test_command`
 
-**Change**: {change-name}
-**Lote**: {tareas implementadas}
+Esto define si la fase tiene que cargar reglas extra de TDD estricto antes de escribir código.
 
-| Tarea | Estado | Archivos |
-|-------|--------|----------|
-| {N.N} | ✅ Completada | `path/to/file` |
+### Step 3: Cargar modulo local si aplica
 
-### Progreso total
-{N}/{M} tareas completadas
+Si `testing.strict_tdd: true`, cargar `strict-tdd.md` antes de implementar.
 
-### Siguiente paso
-{Más tareas pendientes → sdd-apply | Todas completas → sdd-verify}
+Si esta en `false`, no cargar reglas extra y seguir el flujo normal de implementacion.
+
+### Step 4: Implementar cada tarea
+
+Para cada tarea del lote:
+
+1. leer el requirement referenciado en la spec
+2. leer `design.md` si esa tarea depende de decisiones estructurales
+3. leer los archivos listados en la tarea si ya existen
+4. implementar siguiendo la spec como fuente de verdad del QUE
+5. verificar que el criterio de la tarea se cumple
+6. marcar `[x]` solo cuando la tarea este realmente completa
+
+Si una tarea no puede completarse por un bloqueo real, marcar `[~]` y documentar el motivo en `tasks.md` o en el resumen de la fase.
+
+Si durante la implementacion descubris que la spec esta mal, es ambigua o incompleta, detener la fase y reportarlo. No improvises comportamiento fuera de la spec.
+
+### Step 5: Registrar avance
+
+Actualizar:
+
+- `tasks.md` para reflejar el estado real de cada tarea del lote
+- `state.md` siguiendo `_shared/phase-common.md`
+- la tabla de archivos afectados dentro de `state.md`
+
+Registrar cada archivo creado o modificado con el requirement correspondiente. Ese rastro lo usan despues `verify` y `archive`.
+
+### Step 6: Determinar el siguiente paso
+
+Al cerrar la fase:
+
+- si todavia quedan tareas pendientes o bloqueadas, el siguiente paso sigue siendo `sdd-apply`
+- si todas las tareas relevantes del change quedaron completas, el siguiente paso es `sdd-verify`
+
+## Persistence
+
+Escribir o actualizar:
+
+- `openspec/changes/{change-name}/tasks.md`
+- `openspec/changes/{change-name}/state.md`
+
+## Return Envelope
+
+```yaml
+status: success | partial | blocked
+summary: ""
+artifacts:
+  - openspec/changes/{change-name}/tasks.md
+  - openspec/changes/{change-name}/state.md
+next: "sdd-apply o sdd-verify"
+risks:
+  - ""
+skill_resolution: disabled | direct | injected | fallback
 ```
 
 ## Rules
 
-- SIEMPRE leer la spec antes de implementar — la spec es la fuente de verdad
-- SIEMPRE consultar `_shared/abstraction-guide.md` antes de decidir estructura
-- SIEMPRE consultar `docs/known-issues.md` para evitar bugs repetidos
-- Marcar `[x]` en tasks.md SOLO cuando la tarea está realmente completa
-- Registrar CADA archivo en la tabla de archivos afectados de state.md
-- Si una tarea no se puede completar, marcar como `[~]` y documentar el bloqueo
-- Si durante la implementación se descubre que la spec tiene un error, DETENERSE y reportar
-- Seguir convenciones de código existentes del proyecto
-- Aplicar reglas de `openspec/config.yaml` sección `rules.apply` si existen
-- Sobre de retorno según **Sección F** de `_shared/phase-common.md`
+- SIEMPRE leer la spec antes de implementar; la spec es la fuente de verdad.
+- No implementar tareas no asignadas en el lote actual.
+- Usar `tasks.md` y `state.md` como unica continuidad entre lotes.
+- Consultar `docs/known-issues.md` si existe antes de repetir patrones riesgosos.
+- Cargar reglas extra locales solo si `testing.strict_tdd: true`.
+- Marcar `[x]` en `tasks.md` solo cuando la tarea este realmente completa.
+- Si una tarea queda bloqueada, usar `[~]` y documentar el motivo.
+- Si la spec es incorrecta o incompleta, detenerse y reportarlo.
+
+## Optional Modules
+
+- `testing.strict_tdd`: activa `strict-tdd.md`.

@@ -1,4 +1,4 @@
-# Guía de Abstracción
+﻿# Guía de Abstracción
 
 > Referencia compartida para skills que crean o modifican código: sdd-tasks (planifica archivos/funciones), sdd-design (diseña arquitectura), sdd-apply (implementa), sdd-verify (revisa).
 

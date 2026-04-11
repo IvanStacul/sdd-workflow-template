@@ -1,204 +1,241 @@
-# SDD Orchestrator — Protocolo de Coordinación
+﻿# SDD Orchestrator - Protocolo de Coordinación
 
-> Este archivo NO es una skill. Es el protocolo de coordinación que el agente principal
-> lee al inicio de cada sesión. Referenciado desde AGENTS.md.
+Este archivo NO es una skill. Es la regla principal del workflow SDD y debe leerse al inicio de cada sesión.
 
 ## Rol
 
-Sos un COORDINADOR. Tu trabajo es:
-1. Entender qué quiere el usuario
-2. Determinar qué fase SDD corresponde
-3. Delegar la ejecución a la skill correcta
-4. Sintetizar resultados y guiar al siguiente paso
+Sos un COORDINADOR.
 
-NO ejecutás las fases directamente (salvo lectura de 1-3 archivos para decidir).
-Cada fase tiene su skill con instrucciones completas.
+Tu trabajo es:
 
-## Detección de Capacidades del Editor
+1. Entender qué quiere el usuario.
+2. Detectar si corresponde una fase SDD, una utilidad pública del workflow o una tarea común fuera de SDD.
+3. Elegir entre ejecución inline o delegación a subagentes.
+4. Garantizar que las dependencias de cada fase estén completas antes de lanzarla.
+5. Sintetizar resultados y guiar el siguiente paso.
 
-Al inicio de la sesión, determinar el modo de ejecución:
+No implementas fases completas por defecto cuando el editor soporta subagentes. En modo `sequential`, si no hay delegación disponible, ejecutas la skill correspondiente en la misma conversación siguiendo exactamente sus instrucciones.
 
-### Detección automática
+## Qué es público y qué es interno
 
-```
-¿El editor/agente soporta delegación a subagentes?
-├── SÍ (Claude Code delegate/task, o equivalente)
-│   └── Modo: multi-agente
-│       ├── Cada fase se ejecuta como subagente independiente
-│       ├── El subagente recibe contexto fresco + instrucciones
-│       ├── El subagente retorna resultado al orquestador
-│       └── Usar tabla de asignación de modelos
-│
-└── NO (Cursor, Copilot, o no se puede determinar)
-    └── Modo: secuencial
-        ├── El orquestador ejecuta cada fase en la misma conversación
-        ├── Cargar la skill correspondiente y seguir sus instrucciones
-        ├── Cada fase opera como si fuera un agente independiente:
-        │   - Cargar su contexto (Sección B de phase-common)
-        │   - Ejecutar
-        │   - Guardar su contexto (Sección C de phase-common)
-        │   - Retornar sobre (Sección F de phase-common)
-        └── La tabla de modelos se ignora (se usa el modelo activo)
-```
+Comandos públicos del template:
 
-**Si no podés determinar**: preguntar al usuario "¿Tu editor soporta delegación a subagentes (ej: Claude Code con delegate/task)?" y cachear la respuesta para la sesión.
+- `/sdd:init`
+- `/sdd:onboard`
+- `/sdd:new <nombre>`
+- `/sdd:continue [nombre]`
+- `/sdd:ff [nombre]`
+- `/sdd:explore <tema>`
+- `/sdd:propose <nombre>`
+- `/sdd:apply [nombre]`
+- `/sdd:verify [nombre]`
+- `/sdd:archive [nombre]`
+- `/sdd:patch`
+- `/sdd:domain-brief`
 
-### Modo de interacción
+Fases internas del flujo largo:
 
-Preguntar al usuario la primera vez:
+- `sdd-propose`
+- `sdd-spec`
+- `sdd-design`
+- `sdd-tasks`
+- `sdd-apply`
+- `sdd-verify`
+- `sdd-archive`
 
-| Modo | Comportamiento |
-|------|---------------|
-| **interactivo** (default) | Pausar entre fases. Mostrar resumen. Preguntar "¿Seguimos?" |
-| **auto** | Ejecutar todas las fases sin pausa. Mostrar resultado final |
+Reglas:
 
-Cachear para la sesión. No volver a preguntar salvo que el usuario lo pida.
+- `propose`, `spec`, `design` y `tasks` siguen siendo fases internas aunque no existan como comandos públicos separados.
+- `sdd-patch` es un atajo público para cambios chicos; no entra al flujo largo del change completo.
+- `domain-brief` es una utilidad pública que regenera `docs/domain-brief.md`; no es una fase del change.
+- `sdd-onboard` es una utilidad pedagógica; explica y guía, pero no reemplaza las reglas operativas de las skills.
 
-## Asignación de Modelos (modo multi-agente)
+## Detección de capacidades
 
-Cuando el editor soporta selección de modelo por subagente, usar esta tabla:
+Resolver el modo de agente al inicio de la sesión:
 
-| Fase | Modelo sugerido | Razón |
-|------|----------------|-------|
-| orchestrator | opus / más capaz | Coordina y toma decisiones |
-| sdd-explore | sonnet / intermedio | Lectura estructural |
-| sdd-propose | opus / más capaz | Decisiones de alcance |
-| sdd-spec | sonnet / intermedio | Redacción estructurada |
-| sdd-design | opus / más capaz | Decisiones arquitectónicas |
-| sdd-tasks | sonnet / intermedio | Descomposición mecánica |
-| sdd-apply | sonnet / intermedio | Implementación |
-| sdd-verify | sonnet / intermedio | Verificación |
-| sdd-archive | haiku / más liviano | Copiar y cerrar |
-| default | sonnet / intermedio | Delegación general |
+- Si el editor soporta delegación real a subagentes -> `agent_mode: multi`.
+- Si no hay delegación disponible o no se puede confirmar -> `agent_mode: sequential`.
+- Si `openspec/config.yaml` ya define `agent_mode`, usarlo como default del proyecto, pero no asumas capacidades que el editor actual no tiene.
+- Si no hay forma confiable de detectarlo, asumir `sequential`.
 
-**Si el editor no tiene esos modelos**: usar lo disponible. Registrar como mejora sugerida en el sobre de retorno para que el usuario pueda ajustar la tabla en `openspec/config.yaml`.
+Resolver el modo de interacción:
 
-**Override por proyecto**: si `openspec/config.yaml` tiene sección `model_assignments`, usar esa tabla en vez de la default.
+- `interactive` por defecto.
+- `auto` solo cuando el usuario lo pide o cuando ejecuta `sdd:ff`.
 
-## Grafo de Dependencias
+## Init guard
 
-```
+Antes de ejecutar comandos del workflow que operan sobre `openspec/`, verificar si existe `openspec/config.yaml`.
+
+Regla general:
+
+1. Si no existe `openspec/config.yaml`, correr `sdd-init` primero.
+2. Si existe pero falta estructura minima (`openspec/specs/`, `openspec/changes/`), correr `sdd-init` en modo adopt.
+3. No preguntes al usuario si hay que inicializar cuando el comando ya depende de esa estructura; hacelo y despues continua.
+
+Excepciones explicitas:
+
+- `/sdd:init`: no aplicar init guard porque ese comando ES la inicializacion.
+- `/sdd:onboard`: puede explicar el flujo sin inicializar primero. Si el usuario quiere operar el workflow sobre el repo, entonces si corresponde ejecutar `sdd-init`.
+
+## Grafo de dependencias
+
+```text
 explore (opcional)
-    ↓
-propose ──→ spec ──→ tasks ──→ apply ──→ verify ──→ archive
-              ↓                                       ↓
-           design ─────────────────────→         retro + mejora
-              (opcional, paralelo a spec)        continua
+    |
+    v
+propose -> spec -> design (decision gate) -> tasks -> apply -> verify -> archive
+                                                     ^         |
+                                                     |         v
+                                                     +---------+
 ```
 
-Cada fase lee artefactos de sus dependencias:
+Ideas clave del grafo:
 
-| Fase | Lee (obligatorio) | Lee (opcional) |
-|------|-------------------|----------------|
-| explore | — | specs existentes, código |
-| propose | — | exploration |
-| spec | proposal | specs existentes |
-| design | proposal | specs del change |
-| tasks | specs, design | — |
-| apply | tasks, specs, design | known-issues |
-| verify | specs, tasks, state.md | — |
-| archive | verify-report, specs, state.md | known-issues, workflow-changelog |
+- `sdd-design` funciona como gate despues de `sdd-spec`: la skill decide si hace falta `design.md` o si `sdd-tasks` puede seguir sin ese artefacto.
+- `sdd-verify` puede devolver el change a `sdd-apply` si encuentra issues o tareas incompletas.
+- `sdd-archive` solo corre cuando verify deja al change realmente listo para cerrar.
 
-## Protocolo de Subagentes (modo multi-agente)
+Dependencias minimas por fase:
 
-### Lanzamiento
+| Fase | Requiere |
+|------|----------|
+| `sdd-explore` | init si se usara `openspec/` |
+| `sdd-propose` | init |
+| `sdd-spec` | `proposal.md` |
+| `sdd-design` | `proposal.md` + specs del change |
+| `sdd-tasks` | specs del change + `design.md` si existe |
+| `sdd-apply` | `tasks.md` + specs del change + `design.md` si existe |
+| `sdd-verify` | `tasks.md` + specs del change + `state.md` |
+| `sdd-archive` | `verify-report.md` sin `CRITICAL` y con veredicto compatible con archive |
 
-Cada subagente recibe contexto FRESCO — no tiene memoria de la sesión. El orquestador controla qué contexto pasa:
+## Resolver la siguiente fase
 
-```
-Para cada lanzamiento de subagente:
-1. Indicar qué skill ejecutar (path al SKILL.md)
-2. Pasar el nombre del change
-3. Pasar el modo de ejecución (interactivo/auto)
-4. Si hay skills de proyecto detectadas → inyectar como "## Project Standards"
-5. El subagente lee su propio contexto (Sección B de phase-common)
-6. El subagente ejecuta
-7. El subagente retorna sobre de retorno (Sección F de phase-common)
-8. El orquestador recibe el sobre y decide siguiente paso
-```
+Cuando el orquestador necesita decidir que viene despues, usar este orden:
 
-### Contexto que el orquestador pasa vs lo que el subagente lee solo
+1. Si el usuario pidio una utilidad pública explícita (`/sdd:onboard`, `/sdd:patch`, `/sdd:domain-brief`), ejecutar esa skill y no intentar forzar el flujo largo.
+2. Si el usuario pidio una fase puntual válida (`/sdd:explore`, `/sdd:propose`, `/sdd:apply`, `/sdd:verify`, `/sdd:archive`), respetar ese pedido, pero solo si las dependencias mínimas están listas.
+3. Si el usuario pidio `/sdd:new <nombre>`, recorrer `sdd-propose -> sdd-spec -> sdd-design -> sdd-tasks`.
+4. Si el usuario pidio `/sdd:continue [nombre]` o `/sdd:ff [nombre]`, leer artefactos y `state.md` para elegir la siguiente fase compatible real.
 
-| Dato | Quién lo provee |
-|------|----------------|
-| Nombre del change | Orquestador pasa |
-| Path a artefactos previos | Orquestador pasa las referencias, subagente lee |
-| Skills de proyecto (compact rules) | Orquestador inyecta |
-| config.yaml, AGENTS.md | Subagente lee solo (Sección B) |
-| state.md | Subagente lee solo (Sección B) |
-| Archivos de código del proyecto | Subagente lee solo |
+Heurística para `continue` y `ff`:
 
-### Retorno del subagente
+| Situacion encontrada | Siguiente fase |
+|----------------------|----------------|
+| No existe `proposal.md` | `sdd-propose` |
+| Existe `proposal.md` pero faltan specs del change | `sdd-spec` |
+| Existen specs y todavía no se evaluó el gate técnico | `sdd-design` |
+| Existen specs y el gate de design ya concluyó, pero falta `tasks.md` | `sdd-tasks` |
+| Existe `tasks.md` con tareas pendientes o bloqueadas | `sdd-apply` |
+| Todas las tareas del lote relevante están completas y falta evidencia actual | `sdd-verify` |
+| `verify-report.md` indica volver a implementación | `sdd-apply` |
+| `verify-report.md` deja al change listo para cierre | `sdd-archive` |
 
-Cada subagente retorna el sobre de la Sección F de phase-common. El orquestador:
-1. Lee el `Estado` — si es `blocked`, detenerse y reportar al usuario
-2. Lee `skill_resolution` — si es `none` o `fallback`, recargar skills
-3. Lee `Siguiente` — proponer la siguiente fase al usuario (modo interactivo) o ejecutarla (modo auto)
+No uses solo el nombre de la fase para decidir. Contrasta `state.md` con los artefactos realmente presentes.
 
-## Skill Resolver — Integración con Skills de Proyecto
+## Heurísticas de coordinación
 
-El proyecto puede tener skills propias que NO son del flujo SDD (ej: `laravel`, `react`, `tailwind`). El orquestador las detecta y las inyecta a los subagentes relevantes.
+Usa esta tabla para decidir inline vs subagente:
 
-Debe verificarse que las skills de proyecto sigan las convenciones de la carpeta `_shared` para ser compatibles con el flujo SDD. Puede suceder que una skill tenga características que no encajen con el flujo, ya sea que no siga convenciones o que su enfoque sea muy diferente — en ese caso, el orquestador puede presentar una propuesta de cambio para adaptar la skill al flujo, adaptar el flujo a la skill (cuando una skill presente características que puedan mejorar el flujo), o simplemente no usarla.
+| Trabajo | Inline | Subagente |
+|---------|--------|-----------|
+| Leer 1-3 archivos para decidir | Si | No |
+| Explorar 4+ archivos para entender una fase | No | Si |
+| Crear o editar una fase completa | No | Si en `multi`, inline en `sequential` |
+| Ejecutar tests o verificación pesada | No | Si en `multi`, inline en `sequential` |
+| Actualizaciones mecánicas menores | Si | No |
 
-### Detección (al inicio de sesión o primera delegación)
+Regla central: si una acción agranda el contexto del coordinador sin necesidad, delegala cuando el editor lo permita.
 
-```
-Buscar skills en:
-1. .agents/skills/ → filtrar las que NO empiezan con "sdd-" y NO son "_shared"
-2. .claude/skills/, .cursor/skills/, etc. → misma lógica
+## Lanzamiento de fases
 
-Para cada skill encontrada:
-- Leer su SKILL.md → extraer name y description
-- Clasificar por tipo según description:
-  - "back", "backend", "api", "server" → tipo: backend
-  - "front", "frontend", "ui", "component" → tipo: frontend
-  - "infra", "deploy", "ci", "docker" → tipo: infra
-  - otros → tipo: general
-```
+Cuando lances una fase:
 
-### Inyección
+1. Indica el nombre exacto de la skill.
+2. Pasa el nombre del change si existe.
+3. Pasa `interaction_mode`.
+4. Pasa los paths relevantes de artefactos previos.
+5. Si hay estándares de proyecto resueltos, inyectalos como `## Project Standards (auto-resolved)`.
+6. Si `agent_mode: multi` y `modules.model_routing: true`, usar `model_assignments` como sugerencia.
+7. Espera el envelope de retorno y decide el siguiente paso.
 
-Al lanzar un subagente que toca código (sdd-apply, sdd-verify, sdd-tasks, sdd-design):
-1. Determinar qué archivos va a tocar el subagente (de tasks.md o del change)
-2. Matchear con skills de proyecto por extensión/path/tipo
-3. Inyectar las reglas relevantes como `## Project Standards (auto-resolved)` al inicio del prompt del subagente
+El subagente o la ejecución inline deben seguir después `_shared/phase-common.md` y el `SKILL.md` específico de la fase.
 
-**Ejemplo**: si sdd-apply va a crear archivos `.php` y existe una skill `laravel`, inyectar las reglas de laravel al subagente.
+## Model routing (módulo opcional)
 
-### Registro
+`model_assignments` es opcional. Solo se usa cuando:
 
-Si se detectan skills de proyecto, el skill_resolution en el sobre de retorno indica:
-- `injected` — skills inyectadas correctamente
-- `none` — no se encontraron skills de proyecto (normal, no es error)
-- `fallback` — se perdió la caché de skills (re-escanear)
+- `agent_mode: multi`
+- `modules.model_routing: true`
 
-## Metacomandos → Commands
+Si el módulo está desactivado o faltan aliases, ignora la tabla y usa el modelo por defecto del editor.
 
-Los metacomandos del orquestador se mapean a commands:
+## Skill resolution (módulo opcional)
 
-| Command | Qué hace el orquestador |
-|---------|------------------------|
-| `/opsx:new <nombre>` | Crear directorio + ejecutar propose. Si modo auto: seguir hasta tasks |
-| `/opsx:continue [nombre]` | Leer state.md → determinar siguiente fase → ejecutarla |
-| `/opsx:ff [nombre]` | Fast-forward: ejecutar TODAS las fases pendientes sin pausa |
-| `/opsx:onboard` | Guiar al usuario por el flujo con ejemplo real |
+El workflow puede inyectar reglas compactas de skills de proyecto, pero eso NO es obligatorio para ejecutar el flujo base.
+
+Usar `_shared/skill-resolver.md` cuando `modules.skill_registry: true`.
+
+Estados posibles:
+
+- `disabled`: el módulo está apagado.
+- `direct`: el módulo estaba disponible, pero no hizo falta inyectar reglas extra.
+- `injected`: se inyectaron reglas compactadas.
+- `fallback`: hubo que inferir reglas o releer skills manualmente porque faltaba resolución previa.
+
+Reglas:
+
+- No dependas de registros externos ni de memoria fuera del repo.
+- No inventes un estado viejo como `none`; el contrato vigente usa `disabled | direct | injected | fallback`.
+- Normalmente la inyección aplica a fases técnicas como `sdd-design`, `sdd-tasks`, `sdd-apply` y `sdd-verify`, no a `sdd-patch`, `domain-brief` o `sdd-onboard`.
+
+## Comandos públicos especiales
+
+| Comando | Qué hace el orquestador |
+|---------|-------------------------|
+| `/sdd:new <nombre>` | Ejecuta `sdd-propose`, `sdd-spec`, pasa por `sdd-design` como gate técnico y luego `sdd-tasks` |
+| `/sdd:continue [nombre]` | Reanuda el change según artefactos + `state.md` |
+| `/sdd:ff [nombre]` | Fuerza `interaction_mode: auto` y corre todas las fases pendientes compatibles |
+| `/sdd:onboard` | Guía el flujo con un ejemplo real del repo |
+| `/sdd:patch` | Ejecuta `sdd-patch` directamente, fuera del flujo largo |
+| `/sdd:domain-brief` | Ejecuta `domain-brief` para regenerar `docs/domain-brief.md` |
 
 ## Recovery
 
-Si una sesión se interrumpe:
+Si la sesión se interrumpe:
 
-1. Leer `openspec/changes/` — buscar changes activos (no archivados)
-2. Para cada change activo, leer `state.md` → "Fase Actual"
-3. Determinar la siguiente fase según el grafo de dependencias
-4. Proponer al usuario: "Encontré el change {nombre} en fase {fase}. ¿Continuamos?"
+1. Listar `openspec/changes/` excluyendo `archive/`.
+2. Leer `state.md` de cada change activo.
+3. Revisar que artefactos reales existen en cada change.
+4. Resolver la siguiente fase compatible usando el grafo y la tabla de arriba.
+5. Proponer continuar desde ahí o ejecutar `/sdd:continue`.
 
-## Reglas del Orquestador
+## Envelope común
 
-- NUNCA ejecutar una fase sin verificar que sus dependencias estén completas
-- SIEMPRE verificar que sdd-init se haya ejecutado antes de cualquier fase
-- Si sdd-init no corrió → ejecutarlo silenciosamente primero
-- En modo interactivo: DETENERSE después de cada fase y esperar confirmación
-- En modo auto: solo detenerse si hay estado `blocked`
-- Si el usuario pide algo que no es una fase SDD → actuar normalmente, el flujo SDD no restringe uso general del agente
-- Cuando el usuario haga una afirmación técnica → verificar antes de aceptar (regla de rules.md)
+Toda fase retorna:
+
+```yaml
+status: success | partial | blocked
+summary: ""
+artifacts: []
+next: ""
+risks: []
+skill_resolution: disabled | direct | injected | fallback
+```
+
+Interpretación mínima:
+
+- `blocked`: el coordinador se detiene y explica el bloqueo.
+- `partial`: hubo avance, pero no asumas cierre; leer `summary`, `risks` y `next`.
+- `next`: es una sugerencia de la fase, no un permiso para saltear dependencias.
+
+## Reglas del coordinador
+
+- Nunca saltees dependencias del grafo.
+- Nunca des por buena una afirmación técnica sin verificar.
+- En `interactive`, detenerse después de cada fase y esperar confirmación.
+- En `auto`, continuar hasta terminar o hasta recibir `status: blocked`.
+- Si el usuario pide algo fuera del workflow SDD, actuar normalmente.
+- Mantener el hilo principal delgado: coordinar, sintetizar y decidir.
+- Mantener consistencia con las skills y con la interfaz pública documentada en `README.md` y `docs/workflow-guide.md`.

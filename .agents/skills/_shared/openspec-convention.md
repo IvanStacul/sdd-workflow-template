@@ -1,59 +1,111 @@
-# OpenSpec — Convención de Archivos
+﻿﻿# OpenSpec - Convencion de Archivos
 
-## Estructura
+## 1. Estructura
 
-```
+```text
 openspec/
-├── config.yaml              ← Config del proyecto, namespaces, overrides de fase
-├── specs/                   ← Fuente de verdad (specs vigentes, carpetas planas)
-│   └── NNN-domain/
-│       └── spec.md          ← Incluye campo Namespace como metadata
-└── changes/
-    ├── archive/             ← Changes completados (inmutables, con retro.md)
-    │   └── YYYY-MM-DD-NN-slug/
-    └── {prefix}-YYYY-MM-DD-NN-slug/  ← Changes activos
-        ├── state.md
-        ├── exploration.md   ← (opcional)
-        ├── proposal.md
-        ├── specs/
-        │   └── NNN-domain/
-        │       └── spec.md  ← Delta spec
-        ├── design.md
-        ├── tasks.md
-        └── verify-report.md
+|-- config.yaml                       <- config del proyecto y del workflow
+|-- specs/                            <- fuente de verdad consolidada
+|   `-- NNN-capability/
+|       `-- spec.md
+`-- changes/
+    |-- archive/                      <- changes cerrados; no se vuelven a editar
+    `-- {prefix}-YYYY-MM-DD-NN-slug/  <- change activo
+        |-- state.md
+        |-- exploration.md            <- opcional
+        |-- proposal.md
+        |-- specs/
+        |   `-- NNN-capability/
+        |       `-- spec.md           <- delta spec del change
+        |-- design.md                 <- opcional
+        |-- tasks.md
+        |-- verify-report.md
+        |-- retro.md                  <- se crea antes de archivar
 ```
 
-## Naming Convention
+Ideas clave:
+
+- `openspec/specs/` es la fuente de verdad del comportamiento vigente.
+- `openspec/changes/{change-name}/` contiene el trabajo en curso.
+- `openspec/changes/archive/` es el audit trail historico.
+
+## 2. Naming Convention
 
 | Tipo | Formato | Ejemplo |
 |------|---------|---------|
-| Change completo | `spec-YYYY-MM-DD-NN-slug` | `spec-2026-04-09-01-product-variants` |
-| Patch | `patch-YYYY-MM-DD-NN-slug` | `patch-2026-04-09-02-fix-tax-calc` |
-| Spec consolidada | `NNN-domain` | `004-products` |
+| Change completo | `spec-YYYY-MM-DD-NN-slug` | `spec-2026-04-10-01-product-variants` |
+| Patch | `patch-YYYY-MM-DD-NN-slug` | `patch-2026-04-10-02-fix-tax-calc` |
+| Spec consolidada | `NNN-capability` | `004-products` |
 
-`NN` es secuencial por fecha — se reinicia cada día. Para determinar el siguiente NN, contar los directorios existentes en `openspec/changes/` con la misma fecha.
+`NN` es secuencial por fecha y se reinicia cada dia. Para obtener el siguiente valor, contar los directorios activos y archivados con la misma fecha.
 
-## Namespaces
+### 2.1 Capability vs Domain
+
+En este workflow, `capability` y `domain` NO significan lo mismo:
+
+- `capability` = unidad de comportamiento que tiene su propia spec y puede crearse, modificarse o archivarse de forma trazable.
+- `domain` = area funcional mas amplia usada para explicar el sistema a nivel negocio o para agrupar capacidades relacionadas.
+
+Por eso los paths de specs usan `NNN-capability`:
+
+- `openspec/specs/004-products/spec.md` representa UNA spec consolidada concreta.
+- esa spec puede pertenecer a un dominio mas amplio, por ejemplo `inventory`.
+
+Regla practica:
+
+- si estas nombrando carpetas o archivos de specs, pensa en `capability`
+- si estas explicando el sistema para humanos, agrupando areas funcionales o escribiendo `domain-brief`, pensa en `domain`
+
+El nombre del folder puede sonar "de dominio" (`004-products`, `007-orders`), pero en el flujo sigue contando como una `capability`: una unidad de spec versionable dentro de `openspec/specs/`.
+
+## 3. Namespaces
 
 Los namespaces son metadata en la spec, NO carpetas:
 
 ```markdown
-# Spec — Productos
+# Spec - Productos
 **Namespace**: inventory
 ```
 
-Cambiar de namespace = cambiar una línea. Definidos en `openspec/config.yaml`:
+Se definen en `openspec/config.yaml`:
 
 ```yaml
 namespaces:
   - id: inventory
     label: Inventario
+    description: Productos, variantes y stock
 ```
 
-## State.md — Formato
+Si el proyecto no los necesita, `namespaces: []` es valido.
+
+## 4. Config Keys
+
+`openspec/config.yaml` puede contener:
+
+| Clave | Que controla | Opciones / notas |
+|------|---------------|------------------|
+| `agents_md_policy` | Como se gestiona `AGENTS.md` | `managed` / `section` / `readonly`; default recomendado `section` |
+| `agent_mode` | Si el flujo se ejecuta en una conversacion o delega fases | `sequential` / `multi`; `multi` solo si el editor soporta subagentes |
+| `interaction_mode` | Cuanto pausa el flujo para pedir confirmacion | `interactive` / `auto`; default recomendado `interactive` |
+| `model_assignments` | Alias de modelo por fase | Relevante sobre todo en `multi` |
+| `namespaces` | Catalogo de dominios o areas funcionales | Metadata, no carpetas |
+| `testing.strict_tdd` | Si `apply` y `verify` siguen reglas TDD estrictas | Solo tiene sentido si hay test runner |
+| `testing.test_command` | Comando principal de tests | Detectado o completado en `init` |
+| `testing.coverage_command` | Comando de cobertura | Opcional |
+| `testing.typecheck_command` | Comando de typecheck | Opcional |
+| `modules.skill_registry` | Si se resuelven skills de proyecto de forma automatica | Default recomendado `true` |
+| `modules.model_routing` | Si se usan modelos distintos por fase | Solo tiene efecto real con `agent_mode: multi` |
+| `rules.<fase>` | Reglas locales por fase | Complementan `_shared`, no lo reemplazan |
+
+Compatibilidad legacy:
+
+- Si todavia existen `tdd` o `test_command`, leerlos como fallback.
+- El workflow nuevo debe escribir `testing.*`, no las claves legacy.
+
+## 5. State.md - Formato
 
 ```markdown
-# State — {change-name}
+# State - {change-name}
 
 ## Fase Actual
 {fase-actual}
@@ -63,7 +115,7 @@ namespaces:
 
 ---
 
-## Log de Fases (append-only — NO editar entradas anteriores)
+## Log de Fases (append-only - NO editar entradas anteriores)
 
 ### [YYYY-MM-DD HH:MM] {fase}
 - **Estado**: {completado | completado con observaciones | bloqueado}
@@ -77,35 +129,38 @@ namespaces:
 ## Decisiones (solo agregar filas)
 
 | # | Decisión | Tipo | Req Afectado | Fase | Justificación |
-|---|----------|------|-------------|------|---------------|
+|---|----------|------|--------------|------|---------------|
 
 ---
 
-## Archivos Afectados (solo agregar filas)
+## Archivos Afectados
 
 | Archivo | Acción | Req | Fase |
 |---------|--------|-----|------|
 ```
 
-## Artefactos por Fase
+## 6. Artefactos por Fase
 
-| Skill | Crea | Path |
-|-------|------|------|
-| sdd-init | Estructura | `openspec/config.yaml`, directorios |
-| sdd-explore | Opcional | `openspec/changes/{name}/exploration.md` |
-| sdd-propose | Obligatorio | `openspec/changes/{name}/proposal.md` |
-| sdd-spec | Obligatorio | `openspec/changes/{name}/specs/{NNN-domain}/spec.md` |
-| sdd-design | Obligatorio | `openspec/changes/{name}/design.md` |
-| sdd-tasks | Obligatorio | `openspec/changes/{name}/tasks.md` |
-| sdd-apply | Actualiza | `tasks.md` (marca `[x]`), `state.md` (archivos afectados) |
-| sdd-verify | Obligatorio | `openspec/changes/{name}/verify-report.md` |
-| sdd-archive | Mueve + Crea | `→ archive/` + `retro.md`, actualiza specs principales |
-| sdd-patch | Todo en uno | `openspec/changes/{name}/patch.md` |
+| Skill | Crea o actualiza | Path principal |
+|-------|------------------|----------------|
+| `sdd-init` | Estructura y config | `openspec/config.yaml`, directorios, docs base |
+| `sdd-explore` | Exploracion opcional | `openspec/changes/{name}/exploration.md` |
+| `sdd-propose` | Propuesta | `openspec/changes/{name}/proposal.md` |
+| `sdd-spec` | Delta specs del change | `openspec/changes/{name}/specs/{NNN-capability}/spec.md` |
+| `sdd-design` | Diseno tecnico | `openspec/changes/{name}/design.md` |
+| `sdd-tasks` | Plan de tareas | `openspec/changes/{name}/tasks.md` |
+| `sdd-apply` | Estado del plan y codigo | `tasks.md`, `state.md`, codigo del proyecto |
+| `sdd-verify` | Evidencia de verificacion | `openspec/changes/{name}/verify-report.md` |
+| `sdd-archive` | Retro, sync a specs y archive | `retro.md`, `openspec/specs/...`, `openspec/changes/archive/...` |
+| `sdd-patch` | Documento unico del patch | `openspec/changes/archive/{name}/patch.md` |
+| `domain-brief` | Resumen funcional | `docs/domain-brief.md` |
 
-## Reglas de Escritura
+## 7. Reglas de Escritura
 
-- Crear el directorio del change ANTES de escribir artefactos
-- Si un archivo ya existe, LEER primero y ACTUALIZAR (no sobrescribir)
-- Si el directorio del change ya tiene artefactos, el change se está CONTINUANDO
-- Usar `openspec/config.yaml` sección `rules` para reglas específicas por fase
-- El archive es un AUDIT TRAIL — nunca modificar changes archivados
+- Crear el directorio del change ANTES de escribir artefactos.
+- Si un archivo ya existe, LEERLO primero y ACTUALIZARLO (NO sobrescribir).
+- Si el directorio del change ya tiene artefactos, el change se está CONTINUANDO.
+- Usar `openspec/config.yaml` seccion `rules` para reglas locales por fase cuando existan.
+- Archivar solo despues de sincronizar delta specs y de escribir `retro.md`.
+- El archive es inmutable.
+- Los cambios a templates son forward-only: mejoran artefactos nuevos, no reescriben los ya existentes.

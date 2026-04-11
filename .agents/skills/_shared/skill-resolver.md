@@ -1,104 +1,121 @@
-# Skill Resolver — Detección e Inyección de Skills de Proyecto
+﻿# Skill Resolver - Detección e Inyección de Skills de Proyecto
 
-> Protocolo compartido para que el orquestador detecte skills de proyecto
-> (no-SDD) y las inyecte a subagentes que tocan código.
+Este protocolo solo aplica cuando `modules.skill_registry: true`.
 
-## Qué es una "skill de proyecto"
+## Purpose
 
-Cualquier skill en el proyecto que NO sea parte del flujo SDD:
-- NO empieza con `sdd-` en su `name`
-- NO es `_shared/`
-- NO es `domain-brief`
-- Es una skill de tecnología, framework, o convención (ej: `laravel`, `react`, `tailwind`)
+Resolver reglas compactas de skills de proyecto y ponerlas a disposición de las fases que realmente las necesitan, sin depender de memoria externa ni de que el usuario las copie a mano en cada pedido.
 
-## Detección
+La idea es separar capas:
 
-### Directorios a escanear
+- Las skills SDD definen el flujo.
+- Las skills de proyecto definen convenciones de stack, framework o equipo.
+- El resolver compacta esas convenciones para que fases como `sdd-design`, `sdd-tasks`, `sdd-apply` o `sdd-verify` las puedan seguir sin releer todo el catálogo.
 
-```
-.agents/skills/
-.claude/skills/
-.cursor/skills/
-.opencode/skills/
-.gemini/skills/
-```
+Si el módulo está apagado, el workflow sigue funcionando solo con las reglas base de SDD.
 
-### Para cada skill encontrada
+## Qué cuenta como "skill de proyecto"
 
-1. Leer `SKILL.md` → extraer `name` y `description`
-2. Clasificar por tipo:
+Una skill de proyecto es cualquier skill local que:
 
-| Palabras clave en description | Tipo |
-|------------------------------|------|
+- No empieza con `sdd-`.
+- No vive en `_shared/`.
+- No es `domain-brief`.
+- Describe una tecnología, framework, estilo de código o convención del proyecto.
+
+Ejemplos: `laravel`, `react`, `tailwind`, `postgres`, `testing`.
+
+## Fuentes de resolución
+
+Usar este orden:
+
+1. `.atl/skill-registry.md` si existe.
+2. Skills locales en `.agents/skills/`.
+3. Si hace falta compatibilidad entre editores, también escanear `.claude/skills/`, `.cursor/skills/`, `.opencode/skills/` y `.gemini/skills/`.
+
+Preferir un registro consolidado cuando exista. Solo hacer deep scan cuando el registro no está o está incompleto.
+
+## Detección y clasificación
+
+Para cada skill encontrada:
+
+1. Leer `SKILL.md`.
+2. Extraer `name` y `description`.
+3. Clasificarla por tipo.
+4. Compactar sus reglas principales en un bloque breve.
+
+Tabla sugerida de clasificación:
+
+| Palabras clave en `description` | Tipo |
+|---------------------------------|------|
 | back, backend, api, server, laravel, express, django, rails | `backend` |
 | front, frontend, ui, component, react, vue, angular, svelte | `frontend` |
 | infra, deploy, ci, docker, kubernetes, terraform, cloud | `infra` |
 | test, testing, e2e, unit, integration | `testing` |
 | style, css, tailwind, sass, design-system | `styling` |
 | db, database, migration, orm, eloquent, prisma | `data` |
-| (otros) | `general` |
+| otros | `general` |
 
-3. Extraer reglas compactas: leer el body del SKILL.md y condensar las reglas principales en máximo 10 líneas
+Regla de compactacion:
 
-### Caché
+- Extraer solo las reglas que cambian decisiones reales.
+- Maximo 10 lineas por skill.
+- Inyectar texto compacto, no paths a otros `SKILL.md`.
 
-El resultado se cachea para la sesión. Se recarga si:
-- El orquestador detecta `skill_resolution: fallback` en un sobre de retorno
-- El usuario agrega/modifica una skill durante la sesión
+## Cuando inyectar
 
-## Inyección
+Inyectar solo a fases que tocan codigo o definen estructura:
 
-### Cuándo inyectar
+- `sdd-design`
+- `sdd-tasks`
+- `sdd-apply`
+- `sdd-verify`
 
-Solo a subagentes que TOCAN CÓDIGO o DEFINEN ESTRUCTURA:
-- `sdd-tasks` — decide qué archivos crear → necesita saber convenciones
-- `sdd-design` — define arquitectura → necesita saber patrones del stack
-- `sdd-apply` — implementa → necesita seguir convenciones del stack
-- `sdd-verify` — revisa → necesita verificar contra convenciones
+Normalmente no hace falta inyectar a:
 
-NO inyectar a: `sdd-explore`, `sdd-propose`, `sdd-archive`, `sdd-patch`, `domain-brief`
+- `sdd-explore`
+- `sdd-propose`
+- `sdd-archive`
+- `sdd-patch`
+- `domain-brief`
 
-### Cómo inyectar
+`sdd-init` puede usar este modulo para detectar que skills de proyecto existen, pero no necesita inyectar reglas compactadas a otra fase porque todavia esta armando el contexto.
 
-Agregar al prompt del subagente ANTES de las instrucciones de la fase:
+## Matching por contexto
+
+No inyectar todas las skills juntas. Elegir las relevantes para la tarea o los archivos involucrados.
+
+Ejemplos:
+
+- Backend o API -> `backend` y `data`
+- Frontend o componentes -> `frontend` y `styling`
+- Tests -> `testing`
+- Infraestructura -> `infra`
+- Si no matchea nada especifico -> `general`
+
+## Formato de inyeccion
+
+El coordinador puede agregar este bloque antes de la skill de fase:
 
 ```markdown
 ## Project Standards (auto-resolved)
 
 ### {skill-name} ({tipo})
-{reglas compactas — máximo 10 líneas por skill}
-
-### {otra-skill} ({tipo})
 {reglas compactas}
 ```
 
-### Matching por contexto
+## Resultado esperado
 
-No inyectar TODAS las skills — solo las relevantes:
+El coordinador o la fase deben reflejar uno de estos estados:
 
-```
-Para cada tarea/archivo del subagente:
-├── Extensión .php, .blade.php → inyectar skills tipo backend (laravel)
-├── Extensión .tsx, .jsx, .vue → inyectar skills tipo frontend (react)
-├── Extensión .css, .scss → inyectar skills tipo styling (tailwind)
-├── Path contiene /test/, /spec/ → inyectar skills tipo testing
-├── Path contiene /migrations/, /models/ → inyectar skills tipo data
-└── Si no matchea → inyectar solo skills tipo general
-```
+- `disabled`: el modulo esta apagado.
+- `direct`: el modulo estaba disponible, pero no hizo falta inyectar nada adicional.
+- `injected`: se inyectaron reglas compactadas.
+- `fallback`: hubo que releer skills o inferir reglas porque falto resolucion previa.
 
-## Coexistencia con el flujo SDD
+## Rules
 
-Las skills de proyecto COEXISTEN con las skills SDD:
-- Las skills SDD definen el FLUJO (qué fases seguir, qué documentos crear)
-- Las skills de proyecto definen las CONVENCIONES (cómo escribir código)
-- No hay conflicto porque operan en capas diferentes
-- Si una skill de proyecto contradice una regla de `_shared/`, la skill de proyecto tiene prioridad (es más específica)
-
-## Agregar nuevas skills de proyecto
-
-Cuando se detecta que el proyecto usa una tecnología/framework sin skill:
-
-1. Registrar como sugerencia en el sobre de retorno del subagente
-2. El orquestador puede proponer al usuario: "Detecté que usás {tech} pero no hay skill para eso. ¿Querés que cree una?"
-3. Si el usuario acepta → crear la skill siguiendo la spec de Agent Skills (SKILL.md con frontmatter)
-4. Agregar entrada en `docs/workflow-changelog.md` como mejora aplicada
+- No dependas de memoria externa ni de backends propietarios.
+- Si existe un registro consolidado, usarlo antes de escanear todo el repo.
+- Si una skill de proyecto contradice una regla generica de `_shared/`, la skill de proyecto tiene prioridad porque es mas especifica.
+- Si el stack detectado sugiere que falta una skill importante, reportarlo como oportunidad de mejora en `init`, `onboard` o en el resumen de la fase.

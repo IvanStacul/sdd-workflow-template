@@ -1,36 +1,35 @@
-# {Nombre del Sistema} — Descripción Funcional
+﻿# {Nombre del Sistema} - Descripción Funcional
 
 > Generado automáticamente desde las especificaciones vigentes.
 > Última generación: {YYYY-MM-DD}
 
-## ¿Qué es?
+## Qué es
 
-{Descripción del sistema en 2-3 frases para alguien no técnico.}
+{Descripción breve del sistema en 2-3 frases para alguien no técnico.}
 
-## Funcionalidades
+## Dominios funcionales
 
-### {Dominio 1} (ref: `openspec/specs/{NNN-nombre}/`)
+### {Dominio 1}
 
-{Resumen de lo que cubre este dominio — 3-5 frases}
+{Resumen del dominio y del problema que resuelve.}
 
-**Capacidades principales:**
-- {capacidad 1}
-- {capacidad 2}
+**Capabilities vigentes (specs):**
+- `openspec/specs/{NNN-capability}/` - {qué cubre esta capability}
+- `openspec/specs/{NNN-capability}/` - {qué cubre esta capability}
 
-### {Dominio 2} (ref: `openspec/specs/{NNN-nombre}/`)
+### {Dominio 2}
 
-{Resumen}
+{Resumen del dominio.}
 
-**Capacidades principales:**
-- {capacidad 1}
+**Capabilities vigentes (specs):**
+- `openspec/specs/{NNN-capability}/` - {qué cubre esta capability}
 
 ## Relaciones entre dominios
 
-{Cómo se conectan los dominios entre sí — ej: "Ventas depende de Productos
-para resolver precios, y de Stock para verificar disponibilidad."}
+{Cómo se conectan los dominios entre sí y qué dependencias funcionales existen.}
 
 ## Glosario
 
 | Término | Definición |
-|---------|-----------|
+|---------|------------|
 | {término del dominio} | {definición simple} |

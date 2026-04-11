@@ -1,58 +1,89 @@
----
+﻿﻿---
 name: sdd-explore
 description: >
-  Investigar una idea, tecnología o área del codebase antes de proponer un cambio.
-  Trigger: Cuando el usuario quiere entender algo antes de crear un change.
+  Investigar una idea, un área del código o una capacidad antes de proponer un cambio.
+  Trigger: Cuando el usuario ejecuta /sdd:explore o necesita contexto o quiere entender algo antes de crear un change.
 metadata:
-  version: "1.0"
+  version: "2.0"
 ---
 
 ## Purpose
 
-Investigar un tema, área del código, o idea antes de crear una propuesta formal. Esta fase es OPCIONAL — se puede ir directo a propose si el cambio está claro.
+Explorar el estado actual del repo, las specs y la idea del cambio para producir hallazgos accionables sin tomar decisiones de diseño todavía.
 
-Sos un EJECUTOR — investigá directamente. NO lances subagentes.
+Esta fase es OPCIONAL. Si el cambio ya está claro, se puede pasar directo a `sdd-propose`.
 
-## What You Receive
+Sos un EJECUTOR - investigá directamente. NO lances subagentes.
 
-- Tema o pregunta a investigar
-- Nombre del change (si ya se definió)
+## Inputs
 
-## What to Do
+- Tema o pregunta a investigar.
+- Opcionalmente, nombre del change si la exploración ya pertenece a uno.
 
-### Step 1: Cargar contexto
+## Context Load
 
-Seguir **Sección B** de `_shared/phase-common.md`.
+Seguir `_shared/phase-common.md`.
 
-### Step 2: Investigar
+En la practica, eso significa que antes de investigar tenes que leer config, reglas generales, `state.md` si ya existe un change y devolver el envelope común al final.
 
-Según el tipo de exploración:
+Ademas leer lo que corresponda al tipo de exploracion:
 
-**Exploración de c��digo existente**:
-- Leer archivos relevantes del proyecto
-- Identificar patrones, dependencias, posibles impactos
-- Documentar lo encontrado con paths exactos
+- `openspec/changes/{change-name}/exploration.md` si ya existe y estas continuando una exploracion previa.
+- `openspec/specs/` si la pregunta toca comportamiento existente o contradicciones funcionales.
+- código, configuración y docs del proyecto relevantes al tema.
 
-**Exploración de concepto/tecnología**:
-- Investigar enfoques posibles
-- Comparar alternativas con pros/contras
-- Evaluar fit con el stack actual (leer `openspec/config.yaml`)
+Si `openspec/config.yaml` define `rules.explore`, tratarlas como guardrails locales de esta fase. Sirven para priorizar evidencia, riesgos o formato extra del resultado; complementan esta skill, no la reemplazan.
 
-**Exploración de dominio funcional**:
-- Revisar specs existentes en `openspec/specs/`
-- Identificar qué existe, qué falta, qué contradice
-- Mapear dependencias entre specs
+## Steps
 
-### Step 3: Documentar hallazgos
+### Step 1: Clasificar la exploracion
 
-**Si hay change activo**: Crear `openspec/changes/{change-name}/exploration.md`
+Determinar que tipo de exploracion estas haciendo antes de leer archivos al azar:
 
-**Si no hay change**: Devolver inline — la exploración fue informativa.
+- **Código existente**: queres entender implementación actual, dependencias o impacto técnico.
+- **Dominio funcional**: queres saber que cubren hoy las specs, que falta o que se contradice.
+- **Tecnología o enfoque**: queres comparar alternativas o validar fit con el stack actual.
+- **Idea nueva**: queres separar supuestos de evidencia del repo antes de abrir un change.
 
-#### Formato de exploration.md
+Esta clasificación define que evidencia hace falta y donde persiste mejor el resultado.
+
+### Step 2: Recolectar evidencia
+
+Investigar según el tipo detectado:
+
+- **Código existente**:
+  - leer los archivos relevantes del proyecto
+  - identificar patrones, dependencias y zonas impactadas
+  - documentar paths exactos
+- **Dominio funcional**:
+  - revisar `openspec/specs/`
+  - identificar que existe, que falta y que se contradice la idea
+  - mapear dependencias entre specs si aparecen
+- **Tecnología o enfoque**:
+  - comparar alternativas con pros y contras
+  - validar compatibilidad con el stack y las reglas del proyecto
+  - dejar claro que parte viene del repo y que parte es inferencia
+- **Idea nueva**:
+  - contrastar la idea con el estado actual del repo
+  - listar supuestos que todavía no tienen evidencia
+
+No hagas afirmaciones genéricas. Si una conclusión depende del repo, citar el path exacto. Si depende de una inferencia, marcarlo como tal.
+
+### Step 3: Sintetizar hallazgos
+
+Preparar una exploracion útil para la fase siguiente. Como mínimo debe dejar claro:
+
+- que se quiso investigar
+- que evidencia se encontró
+- que alternativas aparecen
+- que impacto estimado tiene el cambio
+- que riesgos u open questions siguen abiertos
+- cual es la recomendacion mas razonable
+
+Usar este formato si escribis `exploration.md`:
 
 ```markdown
-# Exploración — {tema}
+# Exploración - {tema}
 
 ## Pregunta / Objetivo
 {Qué se quiso investigar}
@@ -73,24 +104,49 @@ Según el tipo de exploración:
 ## Impacto Estimado
 - Archivos afectados: {lista o estimación}
 - Specs afectadas: {lista}
-- Riesgo: {bajo | medio | alto} — {justificación}
+- Riesgo: {bajo | medio | alto} - {justificación}
 
 ## Conclusión
 {Resumen de 2-3 frases con recomendación clara}
 ```
 
-### Step 4: Persistir
+### Step 4: Persistir o devolver inline
 
-Seguir **Sección C** de `_shared/phase-common.md` (actualizar state.md si hay change activo).
+Si existe change activo, escribir o actualizar `openspec/changes/{change-name}/exploration.md` y registrar la fase en `state.md` siguiendo `_shared/phase-common.md`.
 
-### Step 5: Retornar resumen
+Si no existe change activo, devolver la exploracion inline. En ese caso no inventes artefactos ni simules un `state.md` inexistente.
 
-Seguir **Sección F** de `_shared/phase-common.md`.
+## Persistence
+
+Si hay change activo:
+
+- `openspec/changes/{change-name}/exploration.md`
+- actualizar `openspec/changes/{change-name}/state.md`
+
+## Return Envelope
+
+```yaml
+status: success | partial | blocked
+summary: ""
+artifacts:
+  - openspec/changes/{change-name}/exploration.md
+next: "sdd-propose o ninguna"
+risks:
+  - ""
+skill_resolution: disabled | direct | injected | fallback
+```
+
+Si devolves la exploracion inline porque no hay change activo, dejar `artifacts: []`.
 
 ## Rules
 
-- NO tomar decisiones de diseño — solo investigar y presentar opciones
-- Incluir siempre paths exactos cuando se referencian archivos del proyecto
-- Si la exploración revela que el cambio es más grande de lo esperado, ADVERTIR
-- Si se encuentran contradicciones en specs existentes, reportarlas como riesgo
-- Mantener exploration.md CONCISO — máximo 200 líneas
+- NO tomar decisiones de diseno. Esta fase investiga y ordena opciones.
+- Citar siempre paths exactos cuando referencies archivos del proyecto.
+- Si la exploracion revela que el cambio es mas grande de lo esperado, marcarlo como riesgo.
+- Si aparecen contradicciones entre specs existentes, reportarlas explicitamente.
+- Separar hechos observados de inferencias.
+- Mantener `exploration.md` conciso: maximo 200 lineas.
+
+## Optional Modules
+
+- No hay modulos obligatorios.

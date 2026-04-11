@@ -1,103 +1,137 @@
----
+﻿﻿---
 name: sdd-tasks
 description: >
-  Descomponer specs y diseño en tareas implementables con dependencias.
-  Trigger: Después de spec (y opcionalmente design) para crear el plan de trabajo.
+  Descomponer specs y design en tareas implementables, chicas y verificables.
+  Trigger: Después de `sdd-spec` y, si existe, `sdd-design`.
 metadata:
-  version: "1.0"
+  version: "2.0"
 ---
 
 ## Purpose
 
-Tomar las specs y el diseño y producir una lista de tareas implementables, agrupadas por fase, con dependencias claras. Cada tarea debe ser completable en una sesión.
+Tomar las specs del change y, si existe, `design.md`, para producir `tasks.md` como plan de implementación ejecutable por lotes.
 
-Sos un EJECUTOR. NO lances subagentes.
+`tasks.md` no es un resumen informal: es la continuidad operativa que después usa `sdd-apply` para elegir lotes, marcar avance y retomar trabajo sin depender de memoria externa.
 
-## What You Receive
+Sos un EJECUTOR - escribí el plan directamente. No lances subagentes.
 
-- Nombre del change
-- Specs + Design (si existe) ya creados
+## Inputs
 
-## What to Do
+- Nombre del change.
+- specs del change.
+- design del change, si existe.
 
-### Step 1: Cargar contexto
+## Context Load
 
-Seguir **Sección B** de `_shared/phase-common.md`.
+Seguir `_shared/phase-common.md`.
+
+En la práctica, eso implica leer config, reglas generales, `state.md` del change si existe y devolver el envelope común al final.
 
 Leer OBLIGATORIAMENTE:
-- `openspec/changes/{change-name}/specs/` — todas las specs
-- `openspec/changes/{change-name}/design.md` (si existe)
 
-Consultar:
-- `_shared/abstraction-guide.md` — para decidir qué archivos/funciones crear
+- `openspec/changes/{change-name}/specs/`
+- `openspec/changes/{change-name}/design.md` si existe
+- `_shared/abstraction-guide.md`
 
-### Step 2: Escribir tasks.md
+Si `openspec/config.yaml` define `rules.tasks`, tratarlas como reglas locales de esta fase. Pueden agregar formato, criterios de granularidad o checks adicionales; complementan esta skill, no la reemplazan.
 
-Usar el template de `assets/tasks.template.md`.
+La referencia a `_shared/abstraction-guide.md` sirve para decidir si conviene separar archivos, helpers o servicios en las tareas. Aun asi, la skill debe dejar una explicacion local de por que se parte el trabajo como se parte.
 
-#### Estructura de tareas
+## Steps
+
+### Step 1: Agrupar por fases
+
+Separar el plan por bloques coherentes de implementacion. El objetivo no es inventar fases ceremoniales, sino ordenar el trabajo de manera que `sdd-apply` pueda tomar un lote sin romper dependencias.
+
+Usar grupos como:
+
+- infraestructura
+- implementacion
+- integracion
+- verificacion o limpieza, si aplica
+
+Si el change es chico, no fuerces cuatro fases. Pocas fases claras son mejores que una taxonomia artificial.
+
+### Step 2: Redactar tareas
+
+Crear o actualizar `openspec/changes/{change-name}/tasks.md` usando `assets/tasks.template.md`.
+
+Ese template debe nombrarse explicitamente aca porque la skill depende de su estructura. `sdd-apply` usa `tasks.md` como continuidad entre lotes y espera el formato de checklist `- [ ]`.
+
+Cada tarea debe incluir:
+
+- checkbox `- [ ]`
+- referencia al requirement
+- archivos afectados
+- dependencias
+- criterio verificable
+
+Formato esperado por tarea:
 
 ```markdown
-# Tareas — {Nombre del Change}
-
-> **Specs**: [specs/](./specs/)
-> **Design**: [design.md](./design.md)
-
-## Convenciones
-- **Estados**: `[ ]` pendiente · `[~]` en progreso · `[x]` completada
-- **Refs**: cada tarea referencia el requirement que implementa
-
----
-
-## PHASE 1 — {Nombre de la fase}
-
 - [ ] 1.1 {Descripción de la tarea} `[REQ-XX]`
   - **Archivos**: `path/to/file.ext`
-  - **Depende de**: —
-  - **Criterio**: {cuándo está completa — verificable}
-
-- [ ] 1.2 {Descripción} `[REQ-XX]`
-  - **Archivos**: `path/to/file.ext`
-  - **Depende de**: 1.1
-  - **Criterio**: {verificable}
-
-## PHASE 2 — {Nombre}
-
-- [ ] 2.1 {Descripción} `[REQ-XX]`
-  - **Archivos**: `path/to/file.ext`, `path/to/other.ext`
-  - **Depende de**: 1.1, 1.2
-  - **Criterio**: {verificable}
+  - **Depende de**: -
+  - **Criterio**: {cuando esta completa, de forma verificable}
 ```
 
-### Step 3: Persistir
+Puntos clave:
 
-Seguir **Sección C** de `_shared/phase-common.md`.
+- la descripción debe ser accionable, no vaga
+- la referencia al requirement conecta la tarea con la spec
+- `**Archivos**` ayuda a `sdd-apply` a cargar el contexto correcto
+- `**Depende de**` define el orden entre lotes
+- `**Criterio**` define cuando puede marcarse `[x]`
 
-### Step 4: Retornar resumen
+Si no existe `design.md`, las tareas igual deben quedar claras a partir de specs. No inventes una pseudo-seccion de design dentro de `tasks.md`: si faltan decisiones estructurales reales, eso es una observación para volver a `sdd-design`, no algo para esconder en el plan.
 
-```markdown
-## Tareas Creadas
+### Step 3: Validar tamaño
 
-**Change**: {change-name}
+Antes de cerrar la fase, revisar:
 
-| Fase | Tareas | Estimación |
-|------|--------|------------|
-| {nombre} | {N} | {sesiones estimadas} |
+- cada tarea puede completarse en una sesión razonable
+- no hay tareas demasiado grandes ni demasiado atomizadas
+- las dependencias son explícitas
+- no hay requirements sin al menos una tarea asociada
+- el plan podría retomarse solo leyendo `tasks.md` y `state.md`
 
-**Total**: {N} tareas en {N} fases
+Si el plan supera ~20 tareas o necesita demasiadas dependencias cruzadas, recomendar dividir el change.
 
-### Siguiente paso
-sdd-apply para comenzar la implementación.
+### Step 4: Registrar fase
+
+Actualizar `state.md` siguiendo `_shared/phase-common.md`.
+
+## Persistence
+
+Escribir o actualizar:
+
+- `openspec/changes/{change-name}/tasks.md`
+- `openspec/changes/{change-name}/state.md`
+
+## Return Envelope
+
+```yaml
+status: success | partial | blocked
+summary: ""
+artifacts:
+  - openspec/changes/{change-name}/tasks.md
+next: "sdd-apply"
+risks:
+  - ""
+skill_resolution: disabled | direct | injected | fallback
 ```
 
 ## Rules
 
-- Cada tarea DEBE referenciar el requirement que implementa `[REQ-XX]`
-- Cada tarea DEBE listar los archivos que se crean/modifican
-- Cada tarea DEBE tener un criterio verificable
-- Las tareas deben ser PEQUEÑAS — completables en una sesión
-- Consultar `_shared/abstraction-guide.md` para decidir estructura de archivos
-- Si el cambio es muy grande (>20 tareas), recomendar dividir en múltiples changes
-- El formato de checkbox `- [ ]` es OBLIGATORIO — sdd-apply parsea este formato
-- Aplicar reglas de `openspec/config.yaml` sección `rules.tasks` si existen
-- Sobre de retorno según **Sección F** de `_shared/phase-common.md`
+- Usar siempre el formato `- [ ]`.
+- No crear tareas vagas o no verificables.
+- Cada tarea debe referenciar el requirement que implementa.
+- Cada tarea debe listar archivos afectados.
+- Mantener dependencias explícitas.
+- Alinear archivos y criterios con las specs.
+- Si existe `design.md`, usarlo para resolver orden y dependencias, no para duplicar texto.
+- Si continuas un `tasks.md` existente, leerlo antes de actualizarlo.
+
+## Optional Modules
+
+- No hay módulos obligatorios.

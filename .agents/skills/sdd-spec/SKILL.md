@@ -1,106 +1,114 @@
----
+﻿---
 name: sdd-spec
 description: >
-  Escribir especificaciones con requisitos, escenarios y casos de borde.
-  Trigger: Después de crear una propuesta, para definir QUÉ debe hacer el sistema.
+  Escribir specs con requirements, scenarios y edge cases a partir de una propuesta aprobable.
+  Trigger: Después de `sdd-propose` o cuando el usuario necesita bajar una propuesta a especificación, para definir QUÉ debe hacer el sistema.
 metadata:
-  version: "1.0"
+  version: "2.0"
 ---
 
 ## Purpose
 
-Tomar la propuesta y producir specs — requisitos estructurados con escenarios que describen QUÉ se agrega, modifica o elimina. Las specs son la fuente de verdad de comportamiento.
+Tomar `proposal.md` y producir specs testeables que describen QUÉ se agrega, modifica o elimina. Estas specs son la fuente de verdad del comportamiento del change y después alimentan `sdd-design`, `sdd-tasks`, `sdd-apply` y `sdd-verify`.
 
-Sos un EJECUTOR — escribí las specs directamente. NO lances subagentes.
+Esta es una fase interna del workflow. Normalmente aparece después de `sdd-propose`, muchas veces dentro de `/sdd:new` o de una continuación, aunque no exista un comando público `/sdd:spec`.
 
-## What You Receive
+Sos un EJECUTOR - escribí las specs directamente. NO lances subagentes.
 
-- Nombre del change
-- Proposal ya creada en `openspec/changes/{change-name}/proposal.md`
+## Inputs
 
-## What to Do
+- Nombre del change.
+- `openspec/changes/{change-name}/proposal.md`.
 
-### Step 1: Cargar contexto
+## Context Load
 
-Seguir **Sección B** de `_shared/phase-common.md`.
+Seguir `_shared/phase-common.md`.
+
+En la práctica, eso implica leer config, reglas generales, `state.md` del change y devolver el envelope común al final.
 
 Leer OBLIGATORIAMENTE:
-- `openspec/changes/{change-name}/proposal.md` — la sección Capabilities es tu contrato
 
-### Step 2: Identificar specs a crear
+- `openspec/changes/{change-name}/proposal.md` - la sección `Capabilities` es tu contrato.
+- `openspec/specs/` para resolver numeración y leer comportamiento vigente cuando haya capabilities modificadas.
+- `openspec/changes/{change-name}/specs/` si ya existen delta specs y estás continuando trabajo previo.
+- `assets/spec.template.md` como base para specs nuevas.
 
-```
-PARA CADA entrada en "Capabilities > Nuevas":
-├── Crear spec COMPLETA: openspec/changes/{change-name}/specs/{NNN-capability}/spec.md
-└── NNN = siguiente número secuencial en openspec/specs/
+Si `openspec/config.yaml` define `rules.spec`, tratarlas como reglas locales de esta fase. Sirven para imponer formato, nomenclatura o cobertura adicional; complementan esta skill, no la reemplazan.
 
-PARA CADA entrada en "Capabilities > Modificadas":
-├── Crear DELTA spec: openspec/changes/{change-name}/specs/{NNN-capability}/spec.md
-└── NNN = el número existente en openspec/specs/
-```
+Si `openspec/config.yaml` define `namespaces`, recordar que son metadata de la spec, no carpetas. Usarlas solo para completar `**Namespace**` cuando aplique.
 
-### Step 3: Leer specs existentes (si hay capabilities modificadas)
+## Steps
 
-Para cada capability modificada, leer `openspec/specs/{NNN-capability}/spec.md` para entender el comportamiento ACTUAL. Tu delta describe CAMBIOS a este comportamiento.
+### Step 1: Identificar capabilities a crear o modificar
 
-### Step 4: Escribir specs
+Leer `proposal.md` y separar:
 
-Usar el template de `assets/spec.template.md`.
+- **Capabilities nuevas** -> cada una genera una spec completa nueva.
+- **Capabilities modificadas** -> cada una genera una delta spec que referencia una spec consolidada existente.
 
-#### Para capabilities NUEVAS → spec completa:
+Si `proposal.md` no deja suficientemente clara esta separacion, corregir la ambiguedad en la propuesta o devolver riesgo explicito. No inventes mappings silenciosos.
+
+### Step 2: Resolver numeración y paths
+
+Para cada capability:
+
+- **Nueva**:
+  - crear `openspec/changes/{change-name}/specs/{NNN-capability}/spec.md`
+  - `NNN` es el siguiente numero libre en `openspec/specs/`
+- **Modificada**:
+  - reutilizar el `NNN` ya existente en `openspec/specs/{NNN-capability}/spec.md`
+  - crear o actualizar `openspec/changes/{change-name}/specs/{NNN-capability}/spec.md`
+
+Si una capability marcada como modificada no existe en `openspec/specs/`, no sigas como si nada. Corregi la propuesta o marca el riesgo explicitamente antes de escribir una delta inconsistente.
+
+### Step 3: Leer specs vigentes cuando haya deltas
+
+Para cada capability modificada, leer la spec consolidada actual en `openspec/specs/{NNN-capability}/spec.md`.
+
+El objetivo de este paso es entender el comportamiento vigente para poder escribir una delta real. Sin esa lectura, `MODIFIED` y `REMOVED` quedan ambiguos y `sdd-archive` no puede sincronizar bien.
+
+### Step 4: Escribir las specs del change
+
+#### 4.1 Capabilities nuevas -> spec completa
+
+Usar `assets/spec.template.md` como template base. El template existe para que no queden secciones huerfanas ni formato divergente entre specs nuevas.
+
+Cada spec nueva debe incluir:
+
+- `# {Nombre de la Capability}`
+- `**Namespace**: {namespace o -}`
+- `## Purpose`
+- `## Requirements`
+- al menos un `#### Scenario:` por requirement
+- `## Edge Cases`
+
+#### 4.2 Capabilities modificadas -> delta spec
+
+Usar este formato:
 
 ```markdown
-# {Nombre de la Capability}
-
-**Namespace**: {namespace de config.yaml o —}
-
-## Purpose
-{Descripción del dominio de esta spec}
-
-## Requirements
-
-### Requirement: {Nombre del Requisito}
-{Descripción usando RFC 2119: MUST, SHALL, SHOULD, MAY}
-
-#### Scenario: {Camino feliz}
-- GIVEN {precondición}
-- WHEN {acción}
-- THEN {resultado esperado}
-- AND {resultado adicional, si hay}
-
-#### Scenario: {Caso de error}
-- GIVEN {precondición}
-- WHEN {acción}
-- THEN {resultado esperado}
-
-## Edge Cases
-
-| Caso | Comportamiento Esperado | Req Relacionado |
-|------|------------------------|-----------------|
-| {descripción} | {qué debe pasar} | {FR-XX-NN} |
-```
-
-#### Para capabilities MODIFICADAS → delta spec:
-
-```markdown
-# Delta — {Nombre de la Capability}
+# Delta - {Nombre de la Capability}
 
 ## ADDED Requirements
 
 ### Requirement: {Nombre}
-{Descripción}
+{Descripcion}
 
 #### Scenario: {nombre}
-- GIVEN / WHEN / THEN
+- GIVEN {precondicion}
+- WHEN {accion}
+- THEN {resultado esperado}
 
 ## MODIFIED Requirements
 
 ### Requirement: {Nombre Existente}
-{Texto COMPLETO actualizado — reemplaza el existente}
-(Previously: {resumen de lo que era antes, en una línea})
+{Texto COMPLETO actualizado}
+(Previously: {resumen de lo que era antes, en una linea})
 
-#### Scenario: {escenario — todos, no solo los que cambian}
-- GIVEN / WHEN / THEN
+#### Scenario: {escenario}
+- GIVEN {precondicion}
+- WHEN {accion}
+- THEN {resultado esperado}
 
 ## REMOVED Requirements
 
@@ -111,57 +119,69 @@ Usar el template de `assets/spec.template.md`.
 ## Edge Cases
 
 | Caso | Comportamiento Esperado | Req Relacionado |
-|------|------------------------|-----------------|
+|------|-------------------------|-----------------|
 ```
 
-### MODIFIED Requirements — Workflow CRÍTICO
+#### 4.3 Workflow critico para `MODIFIED Requirements`
 
+Cuando una requirement existente cambia, seguir este flujo exacto:
+
+1. localizar el requirement en la spec consolidada actual
+2. copiar el bloque ENTERO, desde `### Requirement:` hasta todos sus scenarios
+3. pegarlo bajo `## MODIFIED Requirements`
+4. editar la copia para reflejar el nuevo comportamiento
+5. agregar `(Previously: ...)` para resumir que cambiaba
+
+Esto es obligatorio porque `sdd-archive` necesita un bloque completo para reemplazar el requirement consolidado sin perder scenarios previos.
+
+### Step 5: Validar cobertura minima
+
+Antes de cerrar la fase, revisar:
+
+- cada requirement tiene al menos un scenario
+- todos los scenarios usan Given/When/Then
+- `Edge Cases` existe en cada spec del change
+- la spec describe comportamiento, no implementacion
+- las delta specs distinguen claramente `ADDED`, `MODIFIED` y `REMOVED`
+
+### Step 6: Registrar fase
+
+Actualizar `state.md` siguiendo `_shared/phase-common.md`.
+
+## Persistence
+
+Escribir o actualizar:
+
+- `openspec/changes/{change-name}/specs/{NNN-capability}/spec.md`
+- actualizar `state.md`
+
+## Return Envelope
+
+```yaml
+status: success | partial | blocked
+summary: ""
+artifacts:
+  - openspec/changes/{change-name}/specs/{NNN-capability}/spec.md
+next: "sdd-design o sdd-tasks"
+risks:
+  - ""
+skill_resolution: disabled | direct | injected | fallback
 ```
-1. Localizar el requirement en openspec/specs/{capability}/spec.md
-2. COPIAR el bloque ENTERO — desde `### Requirement:` hasta todos sus scenarios
-3. PEGAR bajo `## MODIFIED Requirements`
-4. EDITAR la copia para reflejar el nuevo comportamiento
-5. Agregar "(Previously: {resumen})" bajo el texto del requirement
 
-¿Por qué copiar-completo-y-editar?
-→ Al archivar, el bloque MODIFIED REEMPLAZA el requirement en la spec principal
-→ Si tu bloque es parcial, el archive PIERDE scenarios que no copiaste
-→ Si agregas comportamiento NUEVO sin cambiar lo existente, usar ADDED
-```
-
-### Step 5: Persistir
-
-Seguir **Sección C** de `_shared/phase-common.md`.
-
-### Step 6: Retornar resumen
-
-```markdown
-## Specs Creadas
-
-**Change**: {change-name}
-
-| Capability | Tipo | Requirements | Scenarios | Edge Cases |
-|-----------|------|-------------|-----------|------------|
-| {nombre} | Nueva/Delta | {N} | {N} | {N} |
-
-### Cobertura
-- Caminos felices: {cubiertos/faltantes}
-- Casos de error: {cubiertos/faltantes}
-- Edge cases: {cubiertos/faltantes}
-
-### Siguiente paso
-sdd-design (si se necesita arquitectura) o sdd-tasks (si el diseño está claro).
-```
+`sdd-design` y `sdd-tasks` son fases internas del flujo. La necesidad de pasar por `sdd-design` depende de si todavia faltan decisiones estructurales.
 
 ## Rules
 
-- SIEMPRE usar Given/When/Then para scenarios
-- SIEMPRE usar RFC 2119 (MUST, SHALL, SHOULD, MAY)
-- La sección **Edge Cases** es OBLIGATORIA — no es opcional
-- Cada requirement DEBE tener al menos UN scenario
-- Los scenarios deben ser TESTEABLES — alguien debe poder escribir un test automatizado
-- NO incluir detalles de implementación — specs describen QUÉ, no CÓMO
-- MODIFIED requirements DEBEN ser el bloque COMPLETO copiado y editado
-- Si agregas comportamiento nuevo sin cambiar lo existente → usar ADDED, no MODIFIED
-- Aplicar reglas de `openspec/config.yaml` sección `rules.spec` si existen
-- Sobre de retorno según **Sección F** de `_shared/phase-common.md`
+- Usar Given/When/Then en todos los scenarios.
+- Usar RFC 2119 (`MUST`, `SHALL`, `SHOULD`, `MAY`) en los requirements.
+- `Edge Cases` es obligatorio.
+- Cada requirement debe tener al menos un scenario.
+- Los scenarios deben ser testeables.
+- No meter implementacion en la spec.
+- En `MODIFIED`, copiar y editar el bloque completo.
+- Si agregas comportamiento nuevo sin cambiar lo existente, usar `ADDED`, no `MODIFIED`.
+- Si continuas una spec ya empezada, leerla antes de actualizarla.
+
+## Optional Modules
+
+- No hay modulos obligatorios.

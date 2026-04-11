@@ -1,165 +1,172 @@
----
+﻿﻿---
 name: sdd-archive
 description: >
-  Archivar un change completado. Retro obligatoria, merge de delta specs,
-  propagación de bugs/lecciones, y mejora continua del flujo.
-  Trigger: Después de verificar un change exitosamente.
+  Cerrar un change, escribir retro obligatoria, propagar bugs/lecciones y sincronizar delta specs a la fuente de verdad.
+  Trigger: Cuando el usuario ejecuta /sdd:archive despues de verify.
 metadata:
-  version: "1.0"
+  version: "2.0"
 ---
 
 ## Purpose
 
-Cerrar el ciclo SDD de un change. Hacer retro, mergear deltas specs a las specs principales, propagar lecciones, y mover a archive. Es la fase más importante para la mejora continua.
+Cerrar el ciclo SDD de un change: escribir la retro obligatoria, sincronizar las delta specs a `openspec/specs/`, propagar bugs y lecciones, y mover el change a `openspec/changes/archive/`.
 
-Sos un EJECUTOR. NO lances subagentes.
+Esta fase es la que transforma trabajo en curso en audit trail util para cambios futuros. Si se hace mal, se pierde trazabilidad o se corrompe la fuente de verdad.
 
-## What You Receive
+Sos un EJECUTOR - archiva directamente. NO lances subagentes.
 
-- Nombre del change
+## Inputs
 
-## What to Do
+- Nombre del change.
 
-### Step 1: Cargar contexto
+## Context Load
 
-Seguir **Sección B** de `_shared/phase-common.md`.
+Seguir `_shared/phase-common.md`.
+
+En la practica, eso implica leer config, reglas generales, `state.md` del change y devolver el envelope comun al final.
 
 Leer OBLIGATORIAMENTE:
+
 - `openspec/changes/{change-name}/verify-report.md`
-- `openspec/changes/{change-name}/specs/` — todos los delta specs
-- `openspec/changes/{change-name}/state.md` — log completo de fases, decisiones, archivos
-- `docs/known-issues.md`
-- `docs/workflow-changelog.md`
+- `openspec/changes/{change-name}/tasks.md`
+- `openspec/changes/{change-name}/specs/` - todos los delta specs del change
+- `openspec/changes/{change-name}/state.md`
+- `docs/known-issues.md` si existe
+- `docs/workflow-changelog.md` si existe
 
-### Step 2: Verificar precondiciones
+Si `openspec/config.yaml` define `rules.archive`, tratarlas como reglas locales de esta fase. Pueden agregar pasos de cierre, formatos de retro o checks extra antes de archivar; complementan esta skill, no la reemplazan.
 
-- Si verify-report tiene issues CRÍTICOS → DETENERSE. No archivar.
-- Si hay tareas pendientes `[ ]` → ADVERTIR y preguntar si continuar.
+## Steps
 
-### Step 3: Retro OBLIGATORIA
+### Step 1: Verificar precondiciones
 
-La retro NO es opcional. Escribir `retro.md` en el directorio del change.
+Detenerse si `verify-report.md` contiene `CRITICAL`. Un change con `CRITICAL` no se archiva.
 
-Usar template de `assets/retro.template.md`:
+Si quedan tareas `[ ]` o `[~]`, no archivar en silencio. Reportar la situacion y pedir confirmacion explicita antes de continuar, porque archivar con trabajo pendiente tiene consecuencias no obvias.
 
-```markdown
-# Retro — {change-name}
+Tambien verificar que existan los artefactos minimos de cierre:
 
-## ¿Qué salió bien?
-- {aspecto positivo del proceso}
+- `verify-report.md`
+- `state.md`
+- delta specs del change, si el change modificaba comportamiento especificado
 
-## ¿Qué salió mal?
-- {problema encontrado}
+### Step 2: Escribir retro obligatoria
 
-## ¿Qué aprendimos?
+La retro NO es opcional. Crear o actualizar `openspec/changes/{change-name}/retro.md` usando `assets/retro.template.md`.
 
-### Bugs encontrados
-| ID | Bug | Causa raíz | Prevención |
-|----|-----|-----------|------------|
+Nombrar el template en este punto es importante: esta fase depende de ese asset para que la retro no quede reducida a texto libre sin bugs, lecciones o mejoras accionables.
 
-### Lecciones
-| ID | Lección | Tipo | Acción sugerida |
-|----|---------|------|-----------------|
-{Tipo: Arquitectura | Flujo | Negocio | Tooling}
+La retro debe incluir como minimo:
 
-## Mejoras al flujo
-| Propuesta | Skill/Archivo afectado | Prioridad |
-|-----------|----------------------|-----------|
+- que salio bien
+- que salio mal
+- bugs encontrados
+- lecciones aprendidas
+- mejoras propuestas al workflow
+- decisiones a preservar desde `state.md`
 
-## Decisiones a preservar
-{Decisiones importantes del state.md que deben quedar como referencia}
-```
+### Step 3: Propagar bugs, lecciones y mejoras
 
-### Step 4: Propagar bugs y lecciones
+Actualizar `docs/known-issues.md` y `docs/workflow-changelog.md` si existen.
 
-#### A `docs/known-issues.md`:
-- Agregar cada bug de la retro en formato estándar (ver template del archivo)
-- Agregar lecciones en la tabla correspondiente según tipo
+Propagacion esperada:
 
-#### A `docs/workflow-changelog.md`:
-- Si la retro propone mejoras al flujo, agregar entrada con estado `propuesta`
+- cada bug relevante de la retro debe quedar registrado en `docs/known-issues.md`
+- las lecciones deben registrarse con un tipo util (`Arquitectura`, `Flujo`, `Negocio`, `Tooling` o similar)
+- las mejoras al workflow deben quedar en `docs/workflow-changelog.md`
 
-#### A skills (mejora continua):
-Si una mejora al flujo es CONCRETA y de bajo riesgo:
-1. Evaluar si el cambio afecta un SKILL.md o un archivo de `_shared/`
-2. Verificar la política de templates (forward-only: solo afecta artefactos nuevos)
-3. Aplicar el cambio Y marcar la entrada en workflow-changelog como `aplicada`
+Si una mejora al flujo es concreta, de bajo riesgo y claramente correcta:
 
-Si la mejora es COMPLEJA o RIESGOSA:
-- Dejar como `propuesta` en workflow-changelog
-- Advertir al usuario para que lo revise manualmente
+1. evaluar si afecta un `SKILL.md`, un template o un archivo de `_shared/`
+2. respetar la politica forward-only de templates
+3. aplicar el cambio y registrar la entrada como `aplicada`
 
-### Step 5: Sync delta specs a specs principales
+Si la mejora es compleja, riesgosa o requiere criterio humano:
+
+- dejarla como `propuesta`
+- no forzar el cambio durante archive
+
+Si `docs/known-issues.md` o `docs/workflow-changelog.md` no existen, no bloquear el archive solo por eso. Reportarlo como observacion y continuar.
+
+### Step 4: Sincronizar delta specs a specs consolidadas
 
 Para cada delta spec en `openspec/changes/{change-name}/specs/`:
 
-#### Si la spec principal EXISTE (`openspec/specs/{NNN-capability}/spec.md`):
+#### Si la spec consolidada YA existe
 
-```
-PARA CADA sección en el delta:
-├── ADDED Requirements → Append al final de Requirements
-├── MODIFIED Requirements → Reemplazar el requirement que coincida por nombre
-└── REMOVED Requirements → Eliminar el requirement que coincida
-```
+Mergear con cuidado:
 
-**Merge cuidadoso**:
-- Matchear requirements por nombre (`### Requirement: {nombre}`)
-- PRESERVAR requirements que no están en el delta
-- Mantener formato Markdown correcto
-- Mergear la sección Edge Cases (agregar nuevos, actualizar existentes)
+- `ADDED Requirements` -> agregar al final de `Requirements`
+- `MODIFIED Requirements` -> reemplazar el requirement completo que coincida por nombre
+- `REMOVED Requirements` -> eliminar el requirement que coincida
 
-#### Si la spec principal NO EXISTE:
+Reglas del merge:
 
-El delta spec ES una spec completa → copiar directamente a `openspec/specs/{NNN-capability}/spec.md`.
+- matchear requirements por nombre (`### Requirement: {nombre}`)
+- preservar requirements no mencionados en el delta
+- mantener formato markdown correcto
+- mergear `Edge Cases` sin perder los existentes utiles
 
-### Step 6: Mover a archive
+#### Si la spec consolidada NO existe
 
-```bash
-mv openspec/changes/{change-name} openspec/changes/archive/{change-name}
-```
+El delta spec funciona como spec inicial -> copiarla a `openspec/specs/{NNN-capability}/spec.md`.
 
-Notar: el change-name YA incluye la fecha como prefijo (`spec-YYYY-MM-DD-NN-slug`), así que no se agrega fecha extra al archivar.
+Esta parte debe ser cuidadosa porque `sdd-spec` ya exige bloques completos para `MODIFIED`. Archive no debe reconstruir comportamiento por inferencia.
 
-### Step 7: Persistir
+### Step 5: Registrar fase final en `state.md`
 
-Seguir **Sección C** de `_shared/phase-common.md`.
+Antes de mover el directorio del change:
 
-### Step 8: Retornar resumen
+- actualizar `state.md` siguiendo `_shared/phase-common.md`
+- registrar la retro y la sincronizacion de specs como parte del cierre
 
-```markdown
-## Change Archivado
+Una vez archivado el change, ese directorio pasa a ser inmutable.
 
-**Change**: {change-name}
-**Archivado en**: `openspec/changes/archive/{change-name}/`
+### Step 6: Mover el change a archive
 
-### Specs sincronizadas
-| Capability | Acción | Detalle |
-|-----------|--------|---------|
-| {NNN-nombre} | Creada/Actualizada | {N added, M modified, K removed} |
+Mover `openspec/changes/{change-name}/` a `openspec/changes/archive/{change-name}/`.
 
-### Retro
-- Bugs registrados: {N}
-- Lecciones registradas: {N}
-- Mejoras al flujo: {N propuestas, N aplicadas}
+No agregar fecha extra: el nombre del change ya incluye su prefijo con fecha.
 
-### Propagación
-- known-issues.md: {✅ actualizado | ℹ️ sin cambios}
-- workflow-changelog.md: {✅ actualizado | ℹ️ sin cambios}
-- Skills modificadas: {lista o "Ninguna"}
+## Persistence
 
-### Ciclo SDD completo ✅
+Escribir o actualizar, antes de mover:
+
+- `openspec/specs/.../spec.md`
+- `openspec/changes/{change-name}/retro.md`
+- `openspec/changes/{change-name}/state.md`
+- `docs/known-issues.md` si existe o si se decide crearlo
+- `docs/workflow-changelog.md` si existe o si se decide crearlo
+
+Luego mover el change al archive.
+
+## Return Envelope
+
+```yaml
+status: success | partial | blocked
+summary: ""
+artifacts:
+  - openspec/changes/archive/{change-name}/retro.md
+  - openspec/specs/.../spec.md
+next: "ninguno"
+risks:
+  - ""
+skill_resolution: disabled | direct | injected | fallback
 ```
 
 ## Rules
 
-- NUNCA archivar un change con issues CRÍTICOS en verify-report
-- La retro es OBLIGATORIA — no saltearla nunca
-- SIEMPRE sincronizar delta specs ANTES de mover a archive
-- Al mergear, PRESERVAR requirements que no están en el delta
-- Los bugs de la retro DEBEN propagarse a known-issues.md
-- Las mejoras al flujo se registran en workflow-changelog.md
-- Mejoras concretas y de bajo riesgo se aplican directamente a los skills
-- Mejoras complejas quedan como `propuesta` para revisión humana
-- Templates forward-only: cambios a templates NO migran artefactos existentes
-- El archive es INMUTABLE — nunca modificar changes archivados
-- Sobre de retorno según **Sección F** de `_shared/phase-common.md`
+- NUNCA archivar un change con `CRITICAL` en `verify-report.md`.
+- La retro es OBLIGATORIA.
+- SIEMPRE sincronizar delta specs ANTES de mover a archive.
+- Al mergear, preservar requirements no mencionados en el delta.
+- Los bugs relevantes de la retro deben propagarse a `docs/known-issues.md`.
+- Las mejoras al flujo deben registrarse en `docs/workflow-changelog.md`.
+- Mejoras concretas y de bajo riesgo se pueden aplicar directamente.
+- Mejoras complejas quedan como `propuesta` para revision humana.
+- Templates forward-only: cambios a templates NO migran artefactos existentes.
+- El archive es INMUTABLE: no modificar changes archivados.
+
+## Optional Modules
+
+- No hay módulos obligatorios.

@@ -1,4 +1,4 @@
-# Diseño — {Nombre del Change}
+﻿﻿# Diseño - {Nombre del Change}
 
 ## Contexto
 
@@ -19,8 +19,8 @@
 **Decisión**: {qué se decidió}
 
 **Alternativas consideradas**:
-1. {alternativa A} — {pros/contras}
-2. {alternativa B} — {pros/contras}
+1. {alternativa A} - {pros/contras}
+2. {alternativa B} - {pros/contras}
 
 **Razón**: {por qué se eligió esta opción}
 
@@ -29,9 +29,9 @@
 | Riesgo | Mitigación |
 |--------|------------|
 
-## Plan de Migración
+## Plan de Implementación / Migración
 
-{Pasos para deployar, estrategia de rollback — si aplica}
+{Pasos a alto nivel para implementar, desplegar o migrar; incluir rollback si aplica}
 
 ## Preguntas Abiertas
 

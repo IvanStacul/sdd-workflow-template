@@ -1,79 +1,85 @@
----
+﻿---
 name: sdd-propose
 description: >
-  Crear una propuesta formal de cambio con motivación, alcance, y capabilities afectadas.
-  Trigger: Cuando se inicia un nuevo change o se ejecuta /opsx:propose.
+  Crear una propuesta formal de cambio con motivación, alcance y capacidades afectadas.
+  Trigger: Cuando el usuario ejecuta /sdd:propose o inicia un change nuevo.
 metadata:
-  version: "1.0"
+  version: "2.0"
 ---
 
 ## Purpose
 
-Crear la propuesta que establece POR QUÉ y QUÉ cambia. Es el contrato entre la idea y las specs. Todo lo que viene después se basa en este documento.
+Crear la propuesta que establece POR QUÉ y QUÉ cambia. Es el contrato entre la idea y las specs: todo lo que viene después depende de que `proposal.md` deje claro el alcance y las capabilities afectadas.
 
-Sos un EJECUTOR — escribí la propuesta directamente. NO lances subagentes.
+Esta fase puede llegar directo por `/sdd:propose` o como parte de `/sdd:new`, pero sigue siendo la misma fase interna del workflow.
 
-## What You Receive
+Sos un EJECUTOR - escribí la propuesta directamente. NO lances subagentes.
 
-- Nombre del change
-- Descripción del cambio deseado (del usuario o de una exploración previa)
+## Inputs
 
-## What to Do
+- Nombre o slug deseado para el change.
+- Descripción del cambio deseado.
+- Exploración previa, si existe.
 
-### Step 1: Cargar contexto
+## Context Load
 
-Seguir **Sección B** de `_shared/phase-common.md`.
+Seguir `_shared/phase-common.md`.
+
+En la práctica, eso implica leer config, reglas generales, `state.md` si el change ya existe y devolver el envelope común al final.
 
 Además leer:
-- `openspec/changes/{change-name}/exploration.md` (si existe)
-- `openspec/specs/` — listar specs existentes para identificar capabilities afectadas
-- `docs/domain-brief.md` (si existe) — entender el dominio
 
-### Step 2: Crear directorio del change
+- `openspec/changes/{change-name}/exploration.md` si existe.
+- `openspec/specs/` para detectar capabilities existentes y no inventar modificaciones.
+- `docs/domain-brief.md` si existe y ayuda a entender el dominio.
 
-```
-openspec/changes/{prefix}-{change-name}/
-```
+Si `openspec/config.yaml` define `rules.proposal`, tratarlas como reglas locales de esta fase. Suelen agregar secciones requeridas, constraints de alcance o criterios de rollout; complementan esta skill, no la reemplazan.
 
-Donde `{prefix}` sigue la convención de `_shared/openspec-convention.md`:
-- `spec-YYYY-MM-DD-NN-slug` para changes completos
-- Determinar NN contando directorios existentes con la misma fecha
+## Steps
 
-### Step 3: Crear state.md
+### Step 1: Resolver nombre y directorio del change
 
-Inicializar `state.md` en el directorio del change usando el formato de `_shared/openspec-convention.md`.
+Crear o continuar un directorio con la convencion de `_shared/openspec-convention.md`:
 
-### Step 4: Escribir proposal.md
+- `spec-YYYY-MM-DD-NN-slug` para changes completos.
+- `slug` sale del nombre provisto por el usuario.
+- `NN` se calcula contando changes activos y archivados de la misma fecha.
+
+Si el usuario ya paso un nombre completo que respeta la convención, preservarlo. Si el directorio ya existe, tratarlo como continuación del mismo change: leer lo que haya antes de escribir y no duplicar carpetas.
+
+### Step 2: Crear o actualizar `state.md`
+
+Inicializar `openspec/changes/{change-name}/state.md` con el formato de `_shared/openspec-convention.md` si todavía no existe.
+
+Si ya existe:
+
+- leerlo primero
+- preservar el historial append-only
+- actualizar solo el puntero de fase y las entradas nuevas que correspondan
+
+### Step 3: Escribir `proposal.md`
+
+`proposal.md` tiene que explicar cada decisión en el punto donde aparece para que `sdd-spec` no tenga que adivinar contexto.
+
+Usar esta estructura:
 
 ```markdown
-# Propuesta — {nombre descriptivo}
+# Propuesta - {nombre descriptivo}
 
 ## Por qué
-
-{1-3 frases sobre el problema u oportunidad. ¿Qué problema resuelve? ¿Por qué ahora?}
+{1-3 frases sobre el problema u oportunidad. Qué problema resuelve. Por qué ahora.}
 
 ## Qué Cambia
-
-{Lista de cambios concretos. Ser específico sobre nuevas capabilities,
-modificaciones, o eliminaciones. Marcar breaking changes con **BREAKING**.}
-
-- {cambio 1}
-- {cambio 2}
+- {cambio concreto 1}
+- {cambio concreto 2}
 
 ## Capabilities
 
 ### Nuevas
-{Capabilities que se introducen. Cada una se convierte en una nueva spec.
-Usar kebab-case. Cada entrada = un archivo specs/{name}/spec.md}
-
 - `{nombre}`: {descripción breve}
 
 ### Modificadas
-{Capabilities existentes cuyas SPECS cambian. Solo listar si cambia
-el comportamiento a nivel spec, no detalles de implementación.
-Cada entrada necesita un delta spec.}
-
-- `{nombre-existente}`: {qué requisito cambia}
+- `{nombre-existente}`: {qué requirement o comportamiento cambia}
 
 ## Alcance
 
@@ -81,53 +87,76 @@ Cada entrada necesita un delta spec.}
 - {funcionalidad incluida}
 
 ### Fuera
-- {funcionalidad excluida} — {motivo}
+- {funcionalidad excluida} - {motivo}
 
 ## Impacto
-
 - **Código**: {módulos/archivos afectados}
-- **APIs**: {endpoints que cambian, si aplica}
+- **APIs**: {interfaces o endpoints afectados, si aplica}
 - **Dependencias**: {nuevas deps o cambios}
-- **Datos**: {migraciones, cambios de schema}
+- **Datos**: {migraciones, schemas o "sin cambios"}
 
 ## Riesgos
 
 | Riesgo | Probabilidad | Impacto | Mitigación |
-|--------|-------------|---------|------------|
+|--------|--------------|---------|------------|
 
 ## Plan de Rollback
-
-{Cómo revertir si algo sale mal. Puede ser "revert del commit" para
-cambios simples, o un plan detallado para migraciones.}
+{Cómo volver atrás si el cambio falla}
 ```
 
-### Step 5: Persistir
+Puntos clave de esta estructura:
 
-Seguir **Sección C** de `_shared/phase-common.md`.
+- `## Capabilities` es el contrato con `sdd-spec`.
+- `### Nuevas` lista capabilities que van a crear specs nuevas.
+- `### Modificadas` lista capabilities existentes cuya spec consolidada necesita un delta.
+- `### Fuera` evita scope creep y debe quedar tan claro como `### Dentro`.
+- `## Plan de Rollback` es obligatorio aunque el rollback sea "revert del commit".
 
-### Step 6: Retornar resumen
+### Step 4: Validar que la propuesta sea accionable
 
-```markdown
-## Propuesta Creada
+Antes de cerrar la fase, revisar:
 
-**Change**: {change-name}
-**Directorio**: openspec/changes/{full-name}/
+- que las capabilities modificadas realmente existan en `openspec/specs/`
+- que el alcance no mezcle decisiones de implementacion
+- que riesgos y rollback no hayan quedado vacios
+- que la propuesta alcance para que `sdd-spec` escriba specs sin inferencias grandes
 
-### Capabilities
-- Nuevas: {N} → {lista}
-- Modificadas: {N} → {lista}
+Si el cambio es demasiado grande, recomendar dividirlo en multiples changes antes de avanzar.
 
-### Siguiente paso
-Ejecutar sdd-spec para escribir las especificaciones, o sdd-design si se necesita definir arquitectura primero.
+### Step 5: Registrar fase
+
+Actualizar `state.md` siguiendo `_shared/phase-common.md`.
+
+## Persistence
+
+Escribir o actualizar:
+
+- `openspec/changes/{change-name}/state.md`
+- `openspec/changes/{change-name}/proposal.md`
+
+## Return Envelope
+
+```yaml
+status: success | partial | blocked
+summary: ""
+artifacts:
+  - openspec/changes/{change-name}/proposal.md
+  - openspec/changes/{change-name}/state.md
+next: "sdd-spec"
+risks:
+  - ""
+skill_resolution: disabled | direct | injected | fallback
 ```
 
 ## Rules
 
-- La sección Capabilities es CRÍTICA — es el contrato entre proposal y specs
-- Investigar specs existentes ANTES de listar capabilities modificadas
-- NO incluir detalles de implementación — eso va en design
-- Incluir SIEMPRE Plan de Rollback, aunque sea simple
-- Alcance Fuera es tan importante como Alcance Dentro — previene scope creep
-- Si el cambio es demasiado grande, RECOMENDAR dividirlo en múltiples changes
-- Sobre de retorno según **Sección F** de `_shared/phase-common.md`
-- Aplicar reglas de `openspec/config.yaml` sección `rules.proposal` si existen
+- Leer specs existentes ANTES de listar capabilities modificadas.
+- No meter detalles de implementación en la propuesta; eso pertenece a `sdd-design`.
+- Incluir SIEMPRE `Plan de Rollback`, aunque sea simple
+- Tratar el change como continuación si ya existe directorio o artefactos previos.
+- Si el scope es demasiado grande, recomendar dividir.
+- No dejar `Capabilities` ambiguas: `sdd-spec` depende de esa sección.
+
+## Optional Modules
+
+- No hay módulos obligatorios.

@@ -1,6 +1,6 @@
-# {Nombre de la Capability}
+﻿﻿# {Nombre de la Capability}
 
-**Namespace**: {namespace}
+**Namespace**: {namespace o -}
 
 ## Purpose
 
@@ -27,5 +27,5 @@
 ## Edge Cases
 
 | Caso | Comportamiento Esperado | Req Relacionado |
-|------|------------------------|-----------------|
+|------|-------------------------|-----------------|
 | {descripción del caso} | {qué debe pasar} | {REQ-XX} |

@@ -1,128 +1,121 @@
----
+﻿---
 name: sdd-onboard
 description: >
-  Guía interactiva paso a paso del flujo SDD usando el código real del proyecto.
-  Trigger: Cuando el usuario es nuevo en el flujo o dice "onboard", "tutorial", "cómo funciona".
+  Guiar al usuario de forma interactiva, paso a paso, por el workflow SDD usando el proyecto real como ejemplo.
+  Trigger: Cuando el usuario ejecuta /sdd:onboard o necesita aprender el flujo (dice "onboard", "tutorial", "cómo funciona").
 metadata:
-  version: "1.0"
+  version: "2.0"
 ---
 
 ## Purpose
 
-Guiar al usuario por el flujo SDD completo usando su proyecto real como ejemplo. No es teórico — cada paso se demuestra con código y specs del proyecto actual.
+Guiar al usuario por el workflow SDD completo usando el repo real como ejemplo. No es una explicacion teorica aislada: cada paso debe anclarse en archivos, specs o código del proyecto actual.
 
 Sos un EJECUTOR. NO lances subagentes.
 
-## What to Do
+## Inputs
 
-### Step 1: Verificar estado del proyecto
+- Estado actual del proyecto.
 
-```
-¿Existe openspec/?
-├── NO → Ejecutar sdd-init primero, luego continuar
-└── SÍ → Leer config.yaml para entender el contexto
-```
+## Context Load
 
-### Step 2: Presentar el flujo
+Leer:
 
-Explicar el flujo en términos simples, usando el proyecto como contexto:
+- `openspec/config.yaml` si existe
+- `openspec/specs/` si existen specs
+- `docs/workflow-guide.md` si existe
+- código del proyecto suficiente para proponer un ejemplo pequeño
 
-```markdown
-## Flujo SDD — Cómo funciona
+## Steps
 
-Tu proyecto es un {tipo de proyecto} con {stack}. 
-El flujo SDD te ayuda a planificar y ejecutar cambios de forma estructurada.
+### Step 1: Verificar init
 
-### Las fases
+Si falta `openspec/config.yaml`, explicar que onboarding puede dar una vista general, pero que el primer paso real del workflow es `sdd-init`.
 
-1. **Explorar** (`/opsx:explore`) — Investigar antes de actuar
-   → "¿Cómo funciona X en el código actual?"
+Si el usuario quiere seguir operando el flujo sobre el repo, correr `sdd-init` primero y despues continuar con el onboarding.
 
-2. **Proponer** (`/opsx:propose`) — Definir qué vas a cambiar y por qué
-   → "Quiero agregar {feature} porque {razón}"
+### Step 2: Explicar fases
 
-3. **Especificar** (automático) — Definir QUÉ debe hacer el sistema
-   → Requisitos con escenarios Given/When/Then
+Explicar el flujo distinguiendo claramente comandos publicos de fases internas.
 
-4. **Diseñar** (opcional) — Definir CÓMO implementarlo
-   → Solo si hay decisiones arquitectónicas
+Usar esta idea base:
 
-5. **Tareas** (automático) — Plan de implementación
-   → Lista de tareas con archivos y criterios
+- `/sdd:new <nombre>` es la puerta de entrada normal al flujo completo
+- ese flujo recorre `propose -> spec -> design (si aplica) -> tasks -> apply -> verify -> archive`
+- `propose`, `spec`, `design` y `tasks` existen como fases del workflow, aunque no siempre existan como comandos publicos separados
+- `/sdd:continue` y `/sdd:ff` sirven para retomar o avanzar un change ya abierto
+- `/sdd:explore` sirve para investigar antes de proponer
+- `/sdd:patch` es un atajo publico para cambios chicos con un unico `patch.md`
+- `/sdd:domain-brief` no es una fase del change: regenera `docs/domain-brief.md` desde specs consolidadas
 
-6. **Implementar** (`/opsx:apply`) — Escribir código
-   → Siguiendo las specs como guía
+Si existe `docs/workflow-guide.md`, usarlo como apoyo pedagogico para que la explicacion siga el flujo publico real del repo.
 
-7. **Verificar** (automático) — Confirmar que cumple specs
-   → Cada scenario verificado
+### Step 3: Proponer un mini ejercicio
 
-8. **Archivar** (`/opsx:archive`) — Cerrar, retro, mejorar
-   → Retro obligatoria + propagación de lecciones
+Buscar algo pequeno y real del repo:
 
-### Para cambios pequeños
-`/opsx:patch` — Todo en un paso, sin flujo completo
-```
+- edge case faltante
+- TODO
+- validacion chica
+- mejora documental acotada
 
-### Step 3: Proponer mini-ejercicio
+Priorizar, en este orden:
 
-Buscar en el proyecto algo CONCRETO y PEQUEÑO para demostrar:
+1. edge case o aclaracion chica sobre una spec existente
+2. TODO o bug acotado que pueda resolverse con `patch`
+3. validacion o mejora chica del codigo
+4. mejora documental puntual si no hay mejor ejemplo tecnico
 
-```
-Estrategias de búsqueda (en orden de preferencia):
-1. Si hay specs existentes → proponer agregar un edge case a una spec
-2. Si hay TODOs en el código → proponer resolver uno
-3. Si hay código sin validación → proponer agregar una validación
-4. Último recurso → proponer agregar documentación a una función compleja
-```
-
-Presentar al usuario:
-
-```markdown
-### 🎯 Mini-ejercicio
-
-Encontré algo que podemos usar de ejemplo:
-{descripción del cambio pequeño}
-
-¿Querés que lo hagamos juntos paso a paso? Puedo usar `/opsx:patch`
-para un cambio así de chico, o el flujo completo `/opsx:new` si
-preferís ver todas las fases.
-```
+Presentar el ejercicio explicando por que conviene usar `/sdd:patch` o `/sdd:new <nombre>` segun el alcance.
 
 ### Step 4: Guiar paso a paso
 
-Si el usuario acepta, ejecutar el flujo elegido PASO A PASO:
-- Después de cada fase, explicar qué se hizo y por qué
-- Mostrar los archivos generados
-- Preguntar si tiene dudas antes de continuar
+Si el usuario acepta, ejecutar el flujo elegido PASO A PASO.
 
-### Step 5: Resumen final
+Despues de cada paso o fase:
 
-```markdown
-## ✅ Onboarding Completo
+- explicar que se hizo
+- mostrar artefactos generados
+- esperar confirmacion del usuario
 
-Acabás de completar tu primer cambio con SDD. Resumen:
+No saltees de una fase a otra como si el onboarding fuera una automatizacion muda. El objetivo es que el usuario entienda que paso y por que.
 
-### Qué se generó
-- {lista de archivos en openspec/}
+### Step 5: Cerrar con resumen operativo
 
-### Comandos que usaste
-- {lista de comandos}
+Al terminar el onboarding, resumir:
 
-### Para el día a día
-- Cambios grandes/medianos → `/opsx:new <nombre>`
-- Cambios pequeños → `/opsx:patch`
-- Continuar algo pendiente → `/opsx:continue`
-- Ver estado → leer `openspec/changes/` 
+- que artefactos se generaron o revisaron
+- que comando uso el usuario o que comando deberia usar la proxima vez
+- cuando conviene `patch` y cuando conviene el flujo completo
+- cual es el siguiente paso recomendado para seguir practicando
 
-### Tip
-El flujo se adapta a vos. Si una fase no aplica (ej: design para un
-cambio simple), se salta. La retro del archive mejora el flujo con el tiempo.
+## Persistence
+
+- No escribe artefactos propios salvo que el usuario acepte ejecutar fases reales del workflow.
+
+## Return Envelope
+
+```yaml
+status: success | partial
+summary: ""
+artifacts: []
+next: "/sdd:new <nombre> o /sdd:patch"
+risks:
+  - ""
+skill_resolution: disabled
 ```
 
 ## Rules
 
-- SIEMPRE usar código/specs reales del proyecto — no inventar ejemplos
-- SIEMPRE detenerse después de cada paso y esperar al usuario
-- Si el proyecto está vacío (sin código), explicar el flujo teóricamente y sugerir empezar con sdd-init + un primer spec
-- Mantener el tono didáctico pero no condescendiente
-- No abrumar con toda la información de una vez — ir paso a paso
+- Usar siempre ejemplos reales del repo.
+- Detenerse después de cada paso importante y esperar confirmación del usuario.
+- Si el proyecto está vacío o casi sin contexto, explicar el flujo de forma guiada y sugerir `sdd-init` + un primer change pequeño.
+- Distinguir siempre comandos públicos de fases internas.
+- No presentar `spec`, `design` o `tasks` como comandos públicos si no existen como tales.
+- Mencionar `patch` y `domain-brief` en su rol real: utilidad pública, no fase interna del change largo.
+- No abrumar con toda la teoría de una vez.
+- Mantener el tono didáctico y colaborativo.
+
+## Optional Modules
+
+- No hay módulos obligatorios.

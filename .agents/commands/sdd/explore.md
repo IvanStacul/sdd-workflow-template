@@ -1,5 +1,5 @@
 ---
-name: "OPSX: Explore"
+name: "SDD: Explore"
 description: "Investigar un tema antes de proponer un cambio"
 ---
 

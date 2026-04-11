@@ -1,7 +1,7 @@
-# Known Issues & Lecciones Aprendidas
+# Known Issues y Lecciones Aprendidas
 
-> Actualizado automáticamente durante el archive de cada change (retro).
-> NO borrar entradas — es un registro acumulativo.
+> Actualizado durante el archive de cada change.
+> No borrar entradas; es un registro acumulativo.
 
 ---
 
@@ -16,15 +16,15 @@ _Ninguno registrado._
 _Ninguno registrado._
 
 <!-- Formato para nuevas entradas:
-### BUG-NNN: {título}
-- **Estado**: 🔴 Activo | ✅ Resuelto
+### BUG-NNN: {titulo}
+- **Estado**: Activo | Resuelto
 - **Detectado en**: {change-name}
-- **Fase**: {fase donde ocurrió}
-- **Descripción**: {qué pasó}
-- **Causa raíz**: {por qué pasó}
-- **Solución**: {qué se hizo}
-- **Prevención**: {qué cambio al flujo evita que vuelva a pasar}
-- **Prevención aplicada**: {sí/no — qué skill se modificó}
+- **Fase**: {fase donde ocurrio}
+- **Descripcion**: {que paso}
+- **Causa raiz**: {por que paso}
+- **Solucion**: {que se hizo}
+- **Prevencion**: {que cambio al flujo evita que vuelva a pasar}
+- **Prevencion aplicada**: {si/no - que skill se modifico}
 -->
 
 ---
@@ -33,31 +33,31 @@ _Ninguno registrado._
 
 ### Arquitectura
 
-| ID | Lección | Origen | Acción tomada |
+| ID | Leccion | Origen | Accion tomada |
 |----|---------|--------|---------------|
 
 ### Flujo de trabajo
 
-| ID | Lección | Origen | Acción tomada |
+| ID | Leccion | Origen | Accion tomada |
 |----|---------|--------|---------------|
 
 ### Negocio
 
-| ID | Lección | Origen | Acción tomada |
+| ID | Leccion | Origen | Accion tomada |
 |----|---------|--------|---------------|
 
 ### Tooling
 
-| ID | Lección | Origen | Acción tomada |
+| ID | Leccion | Origen | Accion tomada |
 |----|---------|--------|---------------|
 
 ---
 
-## Estadísticas
+## Estadisticas
 
-| Métrica | Valor |
+| Metrica | Valor |
 |---------|-------|
 | Total bugs registrados | 0 |
-| Bugs → cambio de flujo | 0 |
+| Bugs -> cambio de flujo | 0 |
 | Lecciones registradas | 0 |
 | Mejoras aplicadas desde retros | 0 |

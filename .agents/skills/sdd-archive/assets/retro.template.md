@@ -1,31 +1,31 @@
-# Retro — {change-name}
+﻿﻿# Retro - {change-name}
 
-## ¿Qué salió bien?
+## Que salió bien
 
-- {aspecto positivo}
+- {aspecto positivo del proceso o de la implementación}
 
-## ¿Qué salió mal?
+## Que salió mal
 
-- {problema encontrado}
+- {problema encontrado o costo inesperado}
 
-## ¿Qué aprendimos?
+## Que aprendimos
 
 ### Bugs encontrados
 
 | ID | Bug | Causa raíz | Prevención |
-|----|-----|-----------|------------|
+|----|-----|------------|------------|
 
 ### Lecciones
 
 | ID | Lección | Tipo | Acción sugerida |
 |----|---------|------|-----------------|
 
-> Tipos: Arquitectura | Flujo | Negocio | Tooling
+> Tipos sugeridos: Arquitectura | Flujo | Negocio | Tooling | General
 
 ## Mejoras al flujo
 
-| Propuesta | Skill/Archivo afectado | Prioridad |
-|-----------|----------------------|-----------|
+| Propuesta | Skill/Archivo afectado | Prioridad | Estado |
+|-----------|------------------------|-----------|--------|
 
 ## Decisiones a preservar
 
