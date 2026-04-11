@@ -1,8 +1,6 @@
-﻿---
+---
 name: sdd-patch
-description: >
-  Registrar e implementar un cambio pequeño sin recorrer el workflow SDD completo.
-  Trigger: Cuando hay un fix, validación nueva o ajuste acotado que igual necesita trazabilidad.
+description: "Registrar e implementar un cambio pequeño sin recorrer el workflow SDD completo. Usar cuando hay un fix, una validacion nueva o un ajuste acotado que igual necesita trazabilidad."
 metadata:
   version: "2.0"
 ---

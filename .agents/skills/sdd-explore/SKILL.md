@@ -1,8 +1,6 @@
-﻿﻿---
+---
 name: sdd-explore
-description: >
-  Investigar una idea, un área del código o una capacidad antes de proponer un cambio.
-  Trigger: Cuando el usuario ejecuta /sdd:explore o necesita contexto o quiere entender algo antes de crear un change.
+description: "Investigar una idea, un área del código o una capacidad antes de proponer un cambio. Usar cuando el usuario ejecuta /sdd:explore o necesita contexto antes de crear un change."
 metadata:
   version: "2.0"
 ---

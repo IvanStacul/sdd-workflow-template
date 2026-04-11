@@ -1,8 +1,6 @@
-﻿﻿---
+---
 name: sdd-tasks
-description: >
-  Descomponer specs y design en tareas implementables, chicas y verificables.
-  Trigger: Después de `sdd-spec` y, si existe, `sdd-design`.
+description: "Descomponer specs y design en tareas implementables, chicas y verificables. Usar después de sdd-spec y, si existe, sdd-design."
 metadata:
   version: "2.0"
 ---

@@ -1,8 +1,6 @@
-﻿﻿---
+---
 name: sdd-archive
-description: >
-  Cerrar un change, escribir retro obligatoria, propagar bugs/lecciones y sincronizar delta specs a la fuente de verdad.
-  Trigger: Cuando el usuario ejecuta /sdd:archive despues de verify.
+description: "Cerrar un change, escribir retro obligatoria, propagar bugs o lecciones y sincronizar delta specs a la fuente de verdad. Usar cuando el usuario ejecuta /sdd:archive despues de verify."
 metadata:
   version: "2.0"
 ---

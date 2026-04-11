@@ -1,8 +1,6 @@
-﻿---
+---
 name: sdd-verify
-description: >
-  Verificar que la implementación cumple las specs usando evidencia estática y, cuando exista, evidencia de ejecución.
-  Trigger: Cuando el usuario ejecuta /sdd:verify o cuando todas las tareas de un change parecen completas.
+description: "Verificar que la implementación cumple las specs usando evidencia estática y, cuando exista, evidencia de ejecución. Usar cuando el usuario ejecuta /sdd:verify o cuando todas las tareas de un change parecen completas."
 metadata:
   version: "2.0"
 ---

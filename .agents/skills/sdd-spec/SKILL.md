@@ -1,8 +1,6 @@
-﻿---
+---
 name: sdd-spec
-description: >
-  Escribir specs con requirements, scenarios y edge cases a partir de una propuesta aprobable.
-  Trigger: Después de `sdd-propose` o cuando el usuario necesita bajar una propuesta a especificación, para definir QUÉ debe hacer el sistema.
+description: "Escribir specs con requirements, scenarios y edge cases a partir de una propuesta aprobable. Usar después de sdd-propose o cuando el usuario necesita bajar una propuesta a especificación, para definir QUÉ debe hacer el sistema."
 metadata:
   version: "2.0"
 ---

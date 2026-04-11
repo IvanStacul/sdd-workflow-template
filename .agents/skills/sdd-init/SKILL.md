@@ -1,8 +1,6 @@
-﻿---
+---
 name: sdd-init
-description: >
-  Inicializar el workflow SDD en un proyecto y escribir la configuración file-based.
-  Trigger: Cuando el usuario ejecuta /sdd:init, quiere iniciar el flujo SDD en un proyecto, o dice "sdd init", "iniciar sdd" u "openspec init". O cuando el orquestador detecta que falta openspec/config.yaml.
+description: "Inicializar el workflow SDD en un proyecto y escribir la configuración file-based. Usar cuando el usuario ejecuta /sdd:init, quiere iniciar el flujo SDD o falta openspec/config.yaml."
 metadata:
   version: "2.0"
 ---

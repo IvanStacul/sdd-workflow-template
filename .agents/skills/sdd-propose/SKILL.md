@@ -1,8 +1,6 @@
-﻿---
+---
 name: sdd-propose
-description: >
-  Crear una propuesta formal de cambio con motivación, alcance y capacidades afectadas.
-  Trigger: Cuando el usuario ejecuta /sdd:propose o inicia un change nuevo.
+description: "Crear una propuesta formal de cambio con motivación, alcance y capacidades afectadas. Usar cuando el usuario ejecuta /sdd:propose o inicia un change nuevo."
 metadata:
   version: "2.0"
 ---

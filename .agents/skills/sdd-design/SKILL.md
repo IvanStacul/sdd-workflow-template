@@ -1,8 +1,6 @@
-﻿﻿---
+---
 name: sdd-design
-description: >
-  Crear un documento de diseño técnico cuando el change necesita decisiones estructurales antes de implementar.
-  Trigger: Cuando la propuesta o las specs requieren decisiones técnicas antes de implementar.
+description: "Crear un documento de diseno tecnico cuando el change necesita decisiones estructurales antes de implementar. Usar cuando la propuesta o las specs requieren decisiones tecnicas antes de implementar."
 metadata:
   version: "2.0"
 ---

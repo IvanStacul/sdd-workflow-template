@@ -1,8 +1,6 @@
-﻿---
+---
 name: sdd-onboard
-description: >
-  Guiar al usuario de forma interactiva, paso a paso, por el workflow SDD usando el proyecto real como ejemplo.
-  Trigger: Cuando el usuario ejecuta /sdd:onboard o necesita aprender el flujo (dice "onboard", "tutorial", "cómo funciona").
+description: "Guiar al usuario de forma interactiva y paso a paso por el workflow SDD usando el proyecto real como ejemplo. Usar cuando el usuario ejecuta /sdd:onboard o necesita aprender el flujo(dice 'onboard', 'tutorial', 'cómo funciona')."
 metadata:
   version: "2.0"
 ---

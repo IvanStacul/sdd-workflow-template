@@ -1,8 +1,6 @@
-﻿---
+---
 name: domain-brief
-description: >
-  Generar o regenerar la descripción funcional del sistema a partir de las specs vigentes.
-  Trigger: Cuando el usuario ejecuta /sdd:domain-brief o necesita un resumen funcional actualizado.
+description: "Generar o regenerar la descripción funcional del sistema a partir de las specs vigentes. Usar cuando el usuario ejecuta /sdd:domain-brief o necesita un resumen funcional actualizado."
 metadata:
   version: "2.0"
 ---

@@ -1,8 +1,6 @@
-﻿﻿---
+---
 name: sdd-apply
-description: >
-  Implementar tareas de un change leyendo specs como fuente de verdad y usando tasks.md como continuidad entre lotes.
-  Trigger: Cuando el usuario ejecuta /sdd:apply o cuando el orquestador lanza implementacion.
+description: "Implementar tareas de un change leyendo specs como fuente de verdad y usando tasks.md como continuidad entre lotes. Usar cuando el usuario ejecuta /sdd:apply o cuando el orquestador lanza implementacion."
 metadata:
   version: "2.0"
 ---
