@@ -91,9 +91,12 @@ Controla como se gestiona `AGENTS.md`.
 | `section` | Solo toca la seccion delimitada `<!-- sdd-workflow:start/end -->` | Repos donde `AGENTS.md` ya tiene contenido propio o puede crecer con otras reglas |
 | `readonly` | Nunca modifica `AGENTS.md` | Repos donde `AGENTS.md` lo mantiene otra herramienta o el usuario no quiere automatizarlo |
 
-Recomendacion: `section`.
+Recomendacion contextual:
 
-Motivo: da una integracion clara sin apropiarse del archivo completo y evita mezclar reglas del workflow con otras reglas del proyecto.
+- `managed` si `AGENTS.md` no existe y no hay evidencia de otro owner o de convivencia necesaria con otras reglas.
+- `section` si `AGENTS.md` ya existe, si el repo ya usa otras instrucciones, o si es razonable esperar crecimiento fuera del workflow.
+
+Motivo: `managed` es mas simple cuando el archivo nace para SDD; `section` evita invadir un archivo compartido.
 
 #### 3.2 `agent_mode`
 
@@ -104,11 +107,22 @@ Controla como se ejecutan las fases.
 | `sequential` | El orquestador ejecuta todas las fases en la misma conversacion | Funciona en cualquier editor; es el default seguro |
 | `multi` | El orquestador puede delegar fases a subagentes | Solo sirve si el editor realmente soporta delegacion |
 
-Preguntar si el editor soporta delegacion a subagentes. Si el usuario no sabe o el editor no lo soporta, usar `sequential`.
+Preguntar si el editor soporta delegacion a subagentes SOLO si no hay evidencia suficiente.
+
+Evidencia valida para elegir `multi` sin preguntar:
+
+- documentacion oficial del editor confirmando agent mode con delegacion o ejecucion autonoma,
+- herramientas/capacidades del entorno que incluyan delegacion a agentes,
+- configuracion existente del proyecto que ya trabaje en `multi`.
+
+Si no hay evidencia o el usuario no lo sabe, usar `sequential`.
 
 Si se elige `multi`, completar `model_assignments` con los aliases disponibles o preservar los ya configurados.
 
-Recomendacion: `sequential`, salvo que el usuario confirme soporte real de subagentes y quiera usarlo.
+Recomendacion contextual:
+
+- `multi` cuando haya evidencia real de delegacion disponible en el editor actual.
+- `sequential` cuando no se pueda confirmar.
 
 #### 3.3 `interaction_mode`
 
@@ -173,19 +187,25 @@ Controla si se usan modelos distintos por fase.
 | `false` | Ignora routing por fase | Menos complejidad; default seguro |
 | `true` | Usa `model_assignments` para elegir modelo segun la fase | Solo tiene sentido real si `agent_mode: multi` |
 
-Recomendacion: `false`, salvo que el editor soporte delegacion y el equipo quiera administrar modelos por fase.
+Recomendacion: `false`, salvo que el editor soporte delegacion y existan aliases de modelo confirmados por config, settings o convencion del equipo.
+
+Si se activa:
+
+- no inventar aliases,
+- usar valores ya configurados en el editor o preservados en `openspec/config.yaml`,
+- si solo hay un modelo confirmado, se puede rutear todo a ese mismo alias y dejar nota de la limitacion.
 
 #### 3.8 Defaults recomendados
 
-Si no hay preferencias explicitas ni restricciones del repo, usar:
+Si no hay preferencias explicitas ni restricciones del repo, usar defaults contextuales:
 
-- `agents_md_policy: section`
-- `agent_mode: sequential`
+- `agents_md_policy: managed` si `AGENTS.md` no existe y no hay otro owner detectable; si no, `section`
+- `agent_mode: multi` si el editor soporta delegacion con evidencia real; si no, `sequential`
 - `interaction_mode: interactive`
 - `namespaces: []`
 - `testing.strict_tdd: false`
 - `modules.skill_registry: true`
-- `modules.model_routing: false`
+- `modules.model_routing: true` solo si hay aliases confirmados; si no, `false`
 
 Si ya existe config, preservar valores explicitos y migrar solo la forma del bloque `testing`.
 

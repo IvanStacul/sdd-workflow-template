@@ -116,6 +116,7 @@ Antes de cerrar la fase, revisar:
 
 - que las capabilities modificadas realmente existan en `openspec/specs/`
 - que el alcance no mezcle decisiones de implementacion
+- que el cambio no mezcle subsistemas independientes que deberían ser changes separados
 - que riesgos y rollback no hayan quedado vacios
 - que la propuesta alcance para que `sdd-spec` escriba specs sin inferencias grandes
 

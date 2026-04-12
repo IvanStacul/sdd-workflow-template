@@ -1,0 +1,73 @@
+# openspec/config.yaml - Generado por sdd-init
+schema: spec-driven
+
+context: |
+  ## Proyecto
+  Template file-based de Spec-Driven Development para inicializar y operar workflows SDD en otros repositorios.
+  ## Stack
+  - Markdown como formato principal para documentación, comandos y artefactos del workflow
+  - Archivos de agente en `.agents/`
+  - Scripts auxiliares Bash y Node.js/CommonJS en `.agents/skills/*/scripts`
+  ## Arquitectura
+  - Template de workflow, no aplicación de negocio
+  - `.agents/` es la fuente de verdad del workflow
+  - Los comandos públicos `/sdd:*` viven en `.agents/commands/sdd/`
+  - Las skills, assets y reglas compartidas viven en `.agents/skills/`
+  ## Convenciones
+  - Documentación y specs en español
+  - Cambios del workflow en archivos Markdown versionados
+
+# Política de AGENTS.md:
+# - managed: el workflow controla todo el archivo
+# - section: solo maneja el bloque sdd-workflow delimitado
+# - readonly: nunca toca AGENTS.md
+agents_md_policy: managed
+
+# Modo de agente:
+# - sequential: todas las fases en una misma conversación
+# - multi: el orquestador puede delegar fases si el editor lo soporta
+agent_mode: multi
+
+# Asignación de modelos por fase.
+# Los nombres deben salir de evidencia real del editor o de config explícita del proyecto.
+model_assignments:
+  orchestrator: opus
+  sdd-explore: sonnet
+  sdd-propose: opus
+  sdd-spec: sonnet
+  sdd-design: opus
+  sdd-tasks: sonnet
+  sdd-apply: sonnet
+  sdd-verify: sonnet
+  sdd-archive: haiku
+  default: sonnet
+
+# Modo de interacción:
+# - interactive: pausa en decisiones relevantes
+# - auto: avanza con menos confirmaciones
+interaction_mode: interactive
+
+# Namespaces: metadata de specs, no carpetas.
+namespaces: []
+
+# Testing detectado durante init.
+# strict_tdd solo tiene sentido si existe un test runner funcional.
+testing:
+  strict_tdd: false
+  test_command: ""
+  coverage_command: ""
+  typecheck_command: ""
+
+# Modulos opcionales del workflow.
+# skill_registry: detecta e inyecta skills de proyecto en fases relevantes.
+# model_routing: usa model_assignments para elegir modelo segun la fase.
+modules:
+  skill_registry: true
+  model_routing: true
+
+# Overrides por fase
+rules:
+  spec:
+    - Incluir sección de Casos de Borde (obligatoria)
+  archive:
+    - Retro obligatoria antes de mover a archive

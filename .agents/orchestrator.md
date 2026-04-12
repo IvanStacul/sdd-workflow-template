@@ -239,3 +239,26 @@ Interpretación mínima:
 - Si el usuario pide algo fuera del workflow SDD, actuar normalmente.
 - Mantener el hilo principal delgado: coordinar, sintetizar y decidir.
 - Mantener consistencia con las skills y con la interfaz pública documentada en `README.md` y `docs/workflow-guide.md`.
+
+## Resumen de progreso entre fases
+
+Cuando el orquestador se detiene entre fases (en modo `interactive`, o al completar una fase en `auto` antes de seguir), mostrar un bloque compacto de progreso. El objetivo es que el usuario sepa dónde está parado sin tener que leer `state.md`.
+
+Formato:
+
+```
+📋 Progreso del change: {nombre}
+  ✅ {fase completada} — {resumen de 1 línea}
+  ⏭️ {fase salteada} — {motivo breve}
+  👉 Siguiente: {fase} — {qué se va a hacer}
+  ⬚ {fases pendientes restantes, si las hay}
+```
+
+Reglas:
+
+- Solo mostrar fases relevantes al change actual, no todo el grafo.
+- `⏭️` se usa cuando una fase se evaluó y se decidió no ejecutar (ej: `design` cuando no hace falta).
+- En `auto`, el bloque se muestra una vez al final de todas las fases ejecutadas, no entre cada una.
+- En `/sdd:patch`, no hace falta el bloque (es un solo paso).
+- Si la fase devolvió `status: blocked` o `partial`, incluir el motivo en el resumen.
+- El bloque se muestra ANTES de pedir confirmación para continuar.

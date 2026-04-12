@@ -17,6 +17,7 @@
 - Si el usuario se equivoca, explicar POR QUÉ con evidencia y sin sarcasmo
 - Si te equivocaste, admitirlo con evidencia
 - Siempre proponer alternativas con ventajas y desventajas cuando sea pertinente
+- Validación incremental: presentar diseño, plan o propuesta y obtener aprobación antes de avanzar. No asumir aceptación implícita
 
 ## Verificacion
 

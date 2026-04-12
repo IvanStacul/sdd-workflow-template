@@ -45,6 +45,16 @@ Determinar que tipo de exploracion estas haciendo antes de leer archivos al azar
 
 Esta clasificación define que evidencia hace falta y donde persiste mejor el resultado.
 
+### Step 1.5: Evaluar alcance temprano
+
+Antes de leer archivos al azar, evaluar si la idea o el tema implica múltiples subsistemas independientes (por ejemplo, "necesitamos auth, notificaciones y un panel de admin"). Si es así:
+
+- Señalarlo de inmediato como hallazgo de alcance.
+- Recomendar descomponer en changes separados antes de profundizar en evidencia.
+- Enfocar la exploración actual en mapear las piezas y sus dependencias, no en investigar cada una en detalle.
+
+Este paso evita invertir evidencia detallada en un scope que después va a necesitar dividirse.
+
 ### Step 2: Recolectar evidencia
 
 Investigar según el tipo detectado:
@@ -140,7 +150,7 @@ Si devolves la exploracion inline porque no hay change activo, dejar `artifacts:
 
 - NO tomar decisiones de diseno. Esta fase investiga y ordena opciones.
 - Citar siempre paths exactos cuando referencies archivos del proyecto.
-- Si la exploracion revela que el cambio es mas grande de lo esperado, marcarlo como riesgo.
+- Si la exploracion revela que el cambio es mas grande de lo esperado o abarca subsistemas independientes, marcarlo como riesgo y recomendar dividir en changes separados.
 - Si aparecen contradicciones entre specs existentes, reportarlas explicitamente.
 - Separar hechos observados de inferencias.
 - Mantener `exploration.md` conciso: maximo 200 lineas.

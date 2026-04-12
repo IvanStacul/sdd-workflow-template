@@ -1,0 +1,5 @@
+# Cursor ignora automáticamente archivos en .gitignore.
+# Necesitamos que .cursor/ sea visible para que Cursor pueda leer
+# los skills y rules que viven ahí.
+# Ver: https://cursor.com/docs/reference/ignore-file
+!.cursor/

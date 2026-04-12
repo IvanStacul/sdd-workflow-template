@@ -1,0 +1,21 @@
+# Mirrors de editores (auto-generados por mirror-agents.sh)
+# Nota: .cursor/ se excluye via .cursorignore (Cursor ignora gitignored files)
+.claude/
+.cursor/
+.github/copilot-instructions.md
+.opencode/
+.gemini/
+.codex/
+.qwen/
+.agent/
+.amazonq/
+
+# Root files auto-generados por mirror (copias/imports de AGENTS.md)
+# CLAUDE.md se genera como import (@AGENTS.md), no como copia
+CLAUDE.md
+GEMINI.md
+CODEX.md
+
+# Otros auto-generados
+.sdd/
+.visual-companion/
