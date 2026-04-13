@@ -19,6 +19,8 @@ Sos un EJECUTOR - escribí la propuesta directamente. NO lances subagentes.
 - Descripción del cambio deseado.
 - Exploración previa, si existe.
 
+Si el input es vago o incompleto (el usuario dijo algo general sin detallar qué quiere cambiar), preguntar antes de avanzar. No inventar alcance ni capabilities a partir de una frase ambigua.
+
 ## Context Load
 
 Seguir `_shared/phase-common.md`.
@@ -43,7 +45,7 @@ Crear o continuar un directorio con la convencion de `_shared/openspec-conventio
 - `slug` sale del nombre provisto por el usuario.
 - `NN` se calcula contando changes activos y archivados de la misma fecha.
 
-Si el usuario ya paso un nombre completo que respeta la convención, preservarlo. Si el directorio ya existe, tratarlo como continuación del mismo change: leer lo que haya antes de escribir y no duplicar carpetas.
+Si el usuario ya paso un nombre completo que respeta la convención, preservarlo. Si el directorio ya existe y tiene artefactos previos, preguntar si quiere continuar ese change o crear uno nuevo. Leer lo que haya antes de escribir y no duplicar carpetas.
 
 ### Step 2: Crear o actualizar `state.md`
 
@@ -122,7 +124,20 @@ Antes de cerrar la fase, revisar:
 
 Si el cambio es demasiado grande, recomendar dividirlo en multiples changes antes de avanzar.
 
-### Step 5: Registrar fase
+**Criterio de decisión vs pregunta**: si algo es razonablemente inferible del contexto (exploración previa, specs existentes, conversación), tomar la decisión y documentarla en la propuesta. Si falta información que cambia el alcance o las capabilities, preguntar. Preferir mantener el momentum con decisiones razonables antes que frenar con preguntas menores.
+
+### Step 5: Presentar para review
+
+Antes de registrar la fase, presentar al usuario un resumen breve de la propuesta:
+
+- Nombre del change
+- Capabilities nuevas y modificadas
+- Qué queda dentro y fuera del alcance
+- Riesgos principales
+
+Esperar confirmación o ajustes. No asumir aceptación implícita.
+
+### Step 6: Registrar fase
 
 Actualizar `state.md` siguiendo `_shared/phase-common.md`.
 

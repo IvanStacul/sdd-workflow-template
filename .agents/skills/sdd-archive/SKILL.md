@@ -15,7 +15,9 @@ Sos un EJECUTOR - archiva directamente. NO lances subagentes.
 
 ## Inputs
 
-- Nombre del change.
+- Nombre del change (opcional si hay uno solo activo).
+
+Si no se especifica nombre, buscar changes activos en `openspec/changes/`. Si hay exactamente uno, usarlo. Si hay varios, preguntar cuál. Siempre anunciar qué change se está archivando antes de empezar.
 
 ## Context Load
 
@@ -40,7 +42,20 @@ Si `openspec/config.yaml` define `rules.archive`, tratarlas como reglas locales 
 
 Detenerse si `verify-report.md` contiene `CRITICAL`. Un change con `CRITICAL` no se archiva.
 
-Si quedan tareas `[ ]` o `[~]`, no archivar en silencio. Reportar la situacion y pedir confirmacion explicita antes de continuar, porque archivar con trabajo pendiente tiene consecuencias no obvias.
+Si quedan tareas `[ ]` o `[~]`, presentar un warning estructurado antes de pedir confirmación:
+
+```
+## Warning: tareas incompletas
+
+**Pendientes**: {N} tareas `[ ]`
+**Bloqueadas**: {M} tareas `[~]`
+
+Archivar con trabajo pendiente significa que esas tareas se pierden del flujo activo.
+
+**Opciones**:
+1. Continuar archivando (las tareas quedan documentadas en la retro)
+2. Cancelar y volver a apply
+```
 
 Tambien verificar que existan los artefactos minimos de cierre:
 
@@ -88,7 +103,18 @@ Si `docs/known-issues.md` o `docs/workflow-changelog.md` no existen, no bloquear
 
 ### Step 4: Sincronizar delta specs a specs consolidadas
 
-Para cada delta spec en `openspec/changes/{change-name}/specs/`:
+Antes de sincronizar, mostrar un preview de qué va a cambiar:
+
+```
+## Sync de delta specs
+
+- `{capability-1}`: {N} requirements agregados, {M} modificados, {K} eliminados
+- `{capability-2}`: spec nueva (no existe consolidada)
+
+¿Procedo con la sincronización?
+```
+
+Esperar confirmación. Luego, para cada delta spec en `openspec/changes/{change-name}/specs/`:
 
 #### Si la spec consolidada YA existe
 
@@ -125,6 +151,20 @@ Una vez archivado el change, ese directorio pasa a ser inmutable.
 Mover `openspec/changes/{change-name}/` a `openspec/changes/archive/{change-name}/`.
 
 No agregar fecha extra: el nombre del change ya incluye su prefijo con fecha.
+
+### Step 7: Resumen de cierre
+
+Mostrar un resumen estructurado del archive:
+
+```
+## Archive completo
+
+**Change**: {change-name}
+**Archivado en**: openspec/changes/archive/{change-name}/
+**Specs sincronizadas**: {lista de capabilities sincronizadas, o "sin delta specs"}
+**Bugs propagados**: {N a known-issues, o "ninguno"}
+**Mejoras al workflow**: {N registradas, K aplicadas, o "ninguna"}
+```
 
 ## Persistence
 
