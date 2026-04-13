@@ -29,9 +29,10 @@ Ejemplos: `laravel`, `react`, `tailwind`, `postgres`, `testing`.
 
 Usar este orden:
 
-1. `.atl/skill-registry.md` si existe.
-2. Skills locales en `.agents/skills/`.
-3. Si hace falta compatibilidad entre editores, también escanear `.claude/skills/`, `.cursor/skills/`, `.opencode/skills/` y `.gemini/skills/`.
+1. `.agents/skill-registry.md` si existe (registro consolidado del proyecto).
+2. `.atl/skill-registry.md` como fallback legacy.
+3. Skills locales en `.agents/skills/`.
+4. Si hace falta compatibilidad entre editores, también escanear `.claude/skills/`, `.cursor/skills/`, `.opencode/skills/` y `.gemini/skills/`.
 
 Preferir un registro consolidado cuando exista. Solo hacer deep scan cuando el registro no está o está incompleto.
 
