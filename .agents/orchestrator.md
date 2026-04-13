@@ -32,6 +32,7 @@ Comandos públicos del template:
 - `/sdd:archive [nombre]`
 - `/sdd:patch`
 - `/sdd:domain-brief`
+- `/sdd:system-overview`
 
 Fases internas del flujo largo:
 
@@ -48,6 +49,7 @@ Reglas:
 - `propose`, `spec`, `design` y `tasks` siguen siendo fases internas aunque no existan como comandos públicos separados.
 - `sdd-patch` es un atajo público para cambios chicos; no entra al flujo largo del change completo.
 - `domain-brief` es una utilidad pública que regenera `docs/domain-brief.md`; no es una fase del change.
+- `system-overview` es una utilidad pública que genera `docs/system-overview.md` con descripción funcional narrativa detallada; no es una fase del change.
 - `sdd-onboard` es una utilidad pedagógica; explica y guía, pero no reemplaza las reglas operativas de las skills.
 
 ## Detección de capacidades
@@ -200,6 +202,7 @@ Reglas:
 | `/sdd:onboard` | Guía el flujo con un ejemplo real del repo |
 | `/sdd:patch` | Ejecuta `sdd-patch` directamente, fuera del flujo largo |
 | `/sdd:domain-brief` | Ejecuta `domain-brief` para regenerar `docs/domain-brief.md` |
+| `/sdd:system-overview` | Ejecuta `system-overview` para generar `docs/system-overview.md` con nivel intermedio o detallado |
 
 ## Recovery
 

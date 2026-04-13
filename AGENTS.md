@@ -52,6 +52,7 @@ Este proyecto usa **Spec-Driven Development** file-based: la fuente de verdad vi
 |---------|-----------|
 | `openspec/config.yaml` | Config del proyecto + módulos opcionales |
 | `docs/domain-brief.md` | Resumen funcional regenerable con `/sdd:domain-brief` |
+| `docs/system-overview.md` | Descripción funcional narrativa completa con `/sdd:system-overview` |
 | `docs/known-issues.md` | Bugs + lecciones aprendidas |
 | `docs/workflow-changelog.md` | Mejora continua del flujo |
 <!-- sdd-workflow:end -->
