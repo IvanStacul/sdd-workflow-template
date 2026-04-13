@@ -12,7 +12,7 @@
 - Estructura base del flujo SDD.
 - Skills: init, explore, propose, spec, design, tasks, apply, verify, archive, patch, domain-brief.
 - Convenciones compartidas: phase-common, openspec-convention, abstraction-guide.
-- Retro obligatoria en archive con propagacion a known-issues.
+- Retro obligatoria en archive con propagación a known-issues.
 - `state.md` con log append-only.
 - Namespaces como metadata, no carpetas.
 - Templates forward-only: las mejoras no reescriben artefactos existentes.
@@ -21,12 +21,12 @@
 
 <!-- Formato para entradas futuras:
 
-## {Descripcion} ({YYYY-MM-DD})
+## {Descripción} ({YYYY-MM-DD})
 
 **Estado**: {propuesta | aplicada | descartada}
 **Origen**: retro de {change-name}
 **Skill/archivo afectado**: {path}
 
-{Descripcion y justificacion}
+{Descripción y justificación}
 
 -->

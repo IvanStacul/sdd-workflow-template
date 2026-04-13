@@ -12,7 +12,7 @@
 - Estructura base del flujo SDD.
 - Skills: init, explore, propose, spec, design, tasks, apply, verify, archive, patch, domain-brief.
 - Convenciones compartidas: phase-common, openspec-convention, abstraction-guide.
-- Retro obligatoria en archive con propagacion a known-issues.
+- Retro obligatoria en archive con propagación a known-issues.
 - `state.md` con log append-only.
 - Namespaces como metadata, no carpetas.
 - Templates forward-only: las mejoras no reescriben artefactos existentes.
@@ -25,7 +25,7 @@
 **Origen**: ajuste post-init del template
 **Skill/archivo afectado**: `.agents/skills/sdd-init/SKILL.md`
 
-Se corrigieron las heuristicas de `sdd-init` para que `agents_md_policy` no caiga en `section` por default cuando `AGENTS.md` no existe y no hay otro owner detectable. Tambien se formalizo que `agent_mode: multi` puede elegirse sin preguntar cuando hay evidencia real del editor, y que `modules.model_routing` solo debe activarse con aliases confirmados por configuracion o settings.
+Se corrigieron las heuristicas de `sdd-init` para que `agents_md_policy` no caiga en `section` por default cuando `AGENTS.md` no existe y no hay otro owner detectable. También se formalizó que `agent_mode: multi` puede elegirse sin preguntar cuando hay evidencia real del editor, y que `modules.model_routing` solo debe activarse con aliases confirmados por configuración o settings.
 
 ---
 
@@ -77,12 +77,12 @@ Se investigó cómo cada editor (VS Code, Claude Code, Cursor, OpenCode) maneja 
 
 <!-- Formato para entradas futuras:
 
-## {Descripcion} ({YYYY-MM-DD})
+## {Descripción} ({YYYY-MM-DD})
 
 **Estado**: {propuesta | aplicada | descartada}
 **Origen**: retro de {change-name}
 **Skill/archivo afectado**: {path}
 
-{Descripcion y justificacion}
+{Descripción y justificación}
 
 -->

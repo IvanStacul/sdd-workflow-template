@@ -1,6 +1,6 @@
 ---
 name: sdd-patch
-description: "Registrar e implementar un cambio pequeño sin recorrer el workflow SDD completo. Usar cuando hay un fix, una validacion nueva o un ajuste acotado que igual necesita trazabilidad."
+description: "Registrar e implementar un cambio pequeño sin recorrer el workflow SDD completo. Usar cuando hay un fix, una validación nueva o un ajuste acotado que igual necesita trazabilidad."
 metadata:
   version: "2.0"
 ---
@@ -9,19 +9,19 @@ metadata:
 
 Resolver cambios chicos que no justifican `propose -> spec -> design -> tasks -> apply -> verify -> archive`, pero que SÍ necesitan quedar documentados para no perder trazabilidad.
 
-`sdd-patch` es un atajo publico del workflow, no una fase interna del change completo. Usa un solo documento (`patch.md`), implementa el cambio y archiva directo cuando termina.
+`sdd-patch` es un atajo público del workflow, no una fase interna del change completo. Usa un solo documento (`patch.md`), implementa el cambio y archiva directo cuando termina.
 
 Sos un EJECUTOR. NO lances subagentes.
 
 ## Inputs
 
-- Descripcion breve del cambio.
+- Descripción breve del cambio.
 
 ## Context Load
 
 Seguir `_shared/phase-common.md`.
 
-En la practica, eso implica leer config y reglas generales antes de tocar el cambio.
+En la práctica, eso implica leer config y reglas generales antes de tocar el cambio.
 
 Leer OBLIGATORIAMENTE:
 
@@ -35,7 +35,7 @@ Leer OBLIGATORIAMENTE:
 Usar patch solo si el cambio:
 
 - toca pocos archivos
-- no introduce un modulo o feature nuevo
+- no introduce un módulo o feature nuevo
 - no cambia arquitectura ni modelo de datos
 - puede describirse y verificarse en un solo `patch.md`
 
@@ -63,7 +63,7 @@ Crear `openspec/changes/patch-YYYY-MM-DD-NN-slug/patch.md`.
 Usar esta estructura mínima:
 
 ```markdown
-# Patch - {descripcion}
+# Patch - {descripción}
 
 ## Motivación
 {por qué se hace este cambio}
@@ -81,9 +81,9 @@ Usar esta estructura mínima:
 {referencia a la spec consolidada afectada o "Ninguna"}
 
 ## Decisiones
-| # | Decision | Tipo | Justificacion |
+| # | Decisión | Tipo | Justificación |
 |---|----------|------|---------------|
-{solo si hubo una decision relevante}
+{solo si hubo una decisión relevante}
 
 ## Verificación
 - [ ] {cómo comprobar que el cambio quedó bien}
@@ -136,7 +136,7 @@ skill_resolution: disabled | direct | fallback
 
 ## Rules
 
-- `patch.md` es el documento unico.
+- `patch.md` es el documento único.
 - No crear `proposal.md`, delta specs, `design.md`, `tasks.md` ni `verify-report.md`.
 - Si el patch afecta una spec, actualizar la spec consolidada directamente.
 - Si el cambio deja de ser pequeno, detenerse y recomendar el flujo completo.

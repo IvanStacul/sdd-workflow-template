@@ -26,7 +26,7 @@ When you look at Vercel's dashboard, you don't think "nice borders." You just un
 
 **The test:** Look at your interface from arm's length. If borders are the first thing you notice, reduce opacity. If you can't find where regions end, increase slightly.
 
-### The Sidebar Decision
+### The Sidebar Decisión
 
 **Why same background as canvas, not different?**
 
@@ -34,7 +34,7 @@ Many dashboards make the sidebar a different color. This fragments the visual sp
 
 Better: Same background, subtle border separation. The sidebar is part of the app, not a separate region. Vercel does this. Supabase does this. The border is enough.
 
-### The Dropdown Decision
+### The Dropdown Decisión
 
 **Why surface-200, not surface-100?**
 
@@ -48,13 +48,13 @@ Overlays (dropdowns, popovers) often need slightly more definition because they'
 
 ## Example: Form Controls
 
-### Input Background Decision
+### Input Background Decisión
 
 **Why darker, not lighter?**
 
 Inputs are "inset" — they receive content, they don't project it. A slightly darker background signals "type here" without needing heavy borders. This is the alternative-background principle.
 
-### Focus State Decision
+### Focus State Decisión
 
 **Why subtle focus states?**
 

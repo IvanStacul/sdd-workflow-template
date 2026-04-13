@@ -1,7 +1,7 @@
 ﻿﻿# Tareas - {Nombre del Change}
 
 > **Specs**: [specs/](./specs/)
-> **Design**: [design.md](./design.md) _(si existe; si no, borrar esta linea)_
+> **Design**: [design.md](./design.md) _(si existe; si no, borrar esta línea)_
 
 ## Convenciones
 

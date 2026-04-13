@@ -58,7 +58,7 @@ Revisar `tasks.md` y clasificar:
 - tareas pendientes
 - tareas bloqueadas
 
-Si quedan tareas `[ ]` o `[~]`, reportarlo como observación relevante del reporte. Verify igual puede producir evidencia útil, pero no debe presentar el change como listo para archivar sin dejar esa situación explicitada.
+Si quedan tareas `[ ]` o `[~]`, reportarlo como observación relevante del reporte. Verify igual puede producir evidencia útil, pero no debe presentar el change como listo para archivar sin dejar esa situación explícitada.
 
 ### Step 3: Armar matriz scenario -> evidence
 
@@ -66,7 +66,7 @@ Para cada requirement y scenario:
 
 1. buscar evidencia estructural en código
 2. buscar tests relacionados
-3. usar `state.md` y archivos afectados como guia para ubicar implementacion relevante
+3. usar `state.md` y archivos afectados como guía para ubicar implementación relevante
 4. si existe test runner, correrlo y capturar evidencia
 5. marcar el scenario como:
    - `COMPLIANT`
@@ -87,9 +87,9 @@ Si existe `testing.typecheck_command`, ejecutarlo.
 Si no existe test runner:
 
 - no declares cumplimiento runtime total
-- registrar riesgo explicito en el reporte
+- registrar riesgo explícito en el reporte
 
-### Step 5: Cargar modulo local si aplica
+### Step 5: Cargar módulo local si aplica
 
 Si `testing.strict_tdd: true`, cargar `strict-tdd-verify.md`.
 
@@ -107,7 +107,7 @@ Incluir:
 Usar una estructura de este estilo:
 
 ```markdown
-# Verificacion - {change-name}
+# Verificación - {change-name}
 
 ## Resumen
 - Estado general: {PASS | PASS con warnings | FAIL}
@@ -175,7 +175,7 @@ skill_resolution: disabled | direct | injected | fallback
 
 - No declarar cumplimiento total sin evidencia.
 - Si hay test runner, usarlo.
-- Si no hay test runner, reportar `STATIC_ONLY` y un riesgo explicito.
+- Si no hay test runner, reportar `STATIC_ONLY` y un riesgo explícito.
 - `CRITICAL` bloquea archive.
 - Si hay tareas pendientes o bloqueadas, dejarlo explicitado en el reporte y en el veredicto.
 - Verificar scenarios y edge cases del change, no solo tests existentes.

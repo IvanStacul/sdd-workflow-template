@@ -27,7 +27,7 @@ Este proyecto usa **Spec-Driven Development** file-based: la fuente de verdad vi
 | `/sdd:apply [nombre]` | Implementar tareas |
 | `/sdd:verify [nombre]` | Verificar cumplimiento con evidencia |
 | `/sdd:archive [nombre]` | Archivar con retro obligatoria |
-| `/sdd:patch` | Cambio chico documentado en un unico `patch.md` |
+| `/sdd:patch` | Cambio chico documentado en un único `patch.md` |
 | `/sdd:domain-brief` | Regenerar `docs/domain-brief.md` desde specs consolidadas |
 
 `/sdd:new <nombre>` normalmente recorre `propose -> spec -> design (si aplica) -> tasks`.

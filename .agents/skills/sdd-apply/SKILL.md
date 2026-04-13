@@ -1,6 +1,6 @@
 ---
 name: sdd-apply
-description: "Implementar tareas de un change leyendo specs como fuente de verdad y usando tasks.md como continuidad entre lotes. Usar cuando el usuario ejecuta /sdd:apply o cuando el orquestador lanza implementacion."
+description: "Implementar tareas de un change leyendo specs como fuente de verdad y usando tasks.md como continuidad entre lotes. Usar cuando el usuario ejecuta /sdd:apply o cuando el orquestador lanza implementación."
 metadata:
   version: "2.0"
 ---
@@ -18,7 +18,7 @@ Sos un EJECUTOR - implementá el código directamente. NO lances subagentes.
 - Nombre del change (opcional si hay uno solo activo).
 - Opcionalmente, tareas específicas a implementar (por ejemplo `1.2` y `2.1`) o un lote puntual.
 
-Si no se especifica nombre, buscar changes activos en `openspec/changes/`. Si hay exactamente uno, usarlo. Si hay varios, preguntar cuál. Siempre anunciar qué change se está usando antes de empezar.
+Si no se específica nombre, buscar changes activos en `openspec/changes/`. Si hay exactamente uno, usarlo. Si hay varios, preguntar cuál. Siempre anunciar qué change se está usando antes de empezar.
 
 ## Context Load
 
@@ -35,7 +35,7 @@ Leer OBLIGATORIAMENTE:
 - `docs/known-issues.md` si existe - para evitar repetir bugs ya conocidos
 - `_shared/abstraction-guide.md`
 
-Si `openspec/config.yaml` define `rules.apply`, tratarlas como reglas locales de esta fase. Pueden agregar restricciones de implementacion, quality gates o formas de registrar evidencia; complementan esta skill, no la reemplazan.
+Si `openspec/config.yaml` define `rules.apply`, tratarlas como reglas locales de esta fase. Pueden agregar restricciones de implementación, quality gates o formas de registrar evidencia; complementan esta skill, no la reemplazan.
 
 ## Steps
 
@@ -66,11 +66,11 @@ Usar fallback legacy solo si faltan esas claves:
 
 Esto define si la fase tiene que cargar reglas extra de TDD estricto antes de escribir código.
 
-### Step 3: Cargar modulo local si aplica
+### Step 3: Cargar módulo local si aplica
 
 Si `testing.strict_tdd: true`, cargar `strict-tdd.md` antes de implementar.
 
-Si esta en `false`, no cargar reglas extra y seguir el flujo normal de implementacion.
+Si está en `false`, no cargar reglas extra y seguir el flujo normal de implementación.
 
 ### Step 4: Implementar cada tarea
 
@@ -116,7 +116,7 @@ Actualizar:
 - `state.md` siguiendo `_shared/phase-common.md`
 - la tabla de archivos afectados dentro de `state.md`
 
-Registrar cada archivo creado o modificado con el requirement correspondiente. Ese rastro lo usan despues `verify` y `archive`.
+Registrar cada archivo creado o modificado con el requirement correspondiente. Ese rastro lo usan después `verify` y `archive`.
 
 ### Step 6: Resumen de sesión
 
@@ -137,7 +137,7 @@ Antes de cerrar, mostrar qué se hizo en este batch:
 
 Al cerrar la fase:
 
-- si todavia quedan tareas pendientes o bloqueadas, el siguiente paso sigue siendo `sdd-apply`
+- si todavía quedan tareas pendientes o bloqueadas, el siguiente paso sigue siendo `sdd-apply`
 - si todas las tareas relevantes del change quedaron completas, el siguiente paso es `sdd-verify`
 
 ## Persistence
@@ -165,7 +165,7 @@ skill_resolution: disabled | direct | injected | fallback
 
 - SIEMPRE leer la spec antes de implementar; la spec es la fuente de verdad.
 - No implementar tareas no asignadas en el lote actual.
-- Usar `tasks.md` y `state.md` como unica continuidad entre lotes.
+- Usar `tasks.md` y `state.md` como única continuidad entre lotes.
 - Consultar `docs/known-issues.md` si existe antes de repetir patrones riesgosos.
 - Cargar reglas extra locales solo si `testing.strict_tdd: true`.
 - Marcar `[x]` en `tasks.md` solo cuando la tarea este realmente completa.

@@ -34,11 +34,11 @@ Los Steps de abajo son una guía, no un checklist. Adaptá el orden y la profund
 
 Seguir `_shared/phase-common.md`.
 
-En la practica, eso significa que antes de investigar tenes que leer config, reglas generales, `state.md` si ya existe un change y devolver el envelope común al final.
+En la práctica, eso significa que antes de investigar tenes que leer config, reglas generales, `state.md` si ya existe un change y devolver el envelope común al final.
 
-Ademas leer lo que corresponda al tipo de exploracion:
+Ademas leer lo que corresponda al tipo de exploración:
 
-- `openspec/changes/{change-name}/exploration.md` si ya existe y estas continuando una exploracion previa.
+- `openspec/changes/{change-name}/exploration.md` si ya existe y estas continuando una exploración previa.
 - `openspec/specs/` si la pregunta toca comportamiento existente o contradicciones funcionales.
 - código, configuración y docs del proyecto relevantes al tema.
 
@@ -108,9 +108,9 @@ Vos: [lee el codebase]
 
 ## Steps
 
-### Step 1: Clasificar la exploracion
+### Step 1: Clasificar la exploración
 
-Determinar que tipo de exploracion estas haciendo antes de leer archivos al azar:
+Determinar que tipo de exploración estas haciendo antes de leer archivos al azar:
 
 - **Código existente**: queres entender implementación actual, dependencias o impacto técnico.
 - **Dominio funcional**: queres saber que cubren hoy las specs, que falta o que se contradice.
@@ -168,14 +168,14 @@ Durante la exploración pueden cristalizar insights que ya son decisiones o requ
 
 ### Step 3: Sintetizar hallazgos
 
-Preparar una exploracion útil para la fase siguiente. Como mínimo debe dejar claro:
+Preparar una exploración útil para la fase siguiente. Como mínimo debe dejar claro:
 
 - que se quiso investigar
 - que evidencia se encontró
 - que alternativas aparecen
 - que impacto estimado tiene el cambio
 - que riesgos u open questions siguen abiertos
-- cual es la recomendacion mas razonable
+- cuál es la recomendación más razonable
 
 Formato sugerido para `exploration.md` (adaptar según lo que se encontró; no todas las secciones son obligatorias):
 
@@ -214,7 +214,7 @@ Formato sugerido para `exploration.md` (adaptar según lo que se encontró; no t
 
 Si existe change activo, escribir o actualizar `openspec/changes/{change-name}/exploration.md` y registrar la fase en `state.md` siguiendo `_shared/phase-common.md`.
 
-Si no existe change activo, devolver la exploracion inline. En ese caso no inventes artefactos ni simules un `state.md` inexistente.
+Si no existe change activo, devolver la exploración inline. En ese caso no inventes artefactos ni simules un `state.md` inexistente.
 
 Si la exploración fue conversacional (varias idas y vueltas), sintetizar los hallazgos clave al final antes de persistir. No volcar el log de conversación crudo.
 
@@ -238,14 +238,14 @@ risks:
 skill_resolution: disabled | direct | injected | fallback
 ```
 
-Si devolves la exploracion inline porque no hay change activo, dejar `artifacts: []`.
+Si devolves la exploración inline porque no hay change activo, dejar `artifacts: []`.
 
 ## Rules
 
-- NO tomar decisiones de diseno. Esta fase investiga y ordena opciones.
+- NO tomar decisiones de diseño. Esta fase investiga y ordena opciones.
 - Citar siempre paths exactos cuando referencies archivos del proyecto.
-- Si la exploracion revela que el cambio es mas grande de lo esperado o abarca subsistemas independientes, marcarlo como riesgo y recomendar dividir en changes separados.
-- Si aparecen contradicciones entre specs existentes, reportarlas explicitamente.
+- Si la exploración revela que el cambio es más grande de lo esperado o abarca subsistemas independientes, marcarlo como riesgo y recomendar dividir en changes separados.
+- Si aparecen contradicciones entre specs existentes, reportarlas explícitamente.
 - Separar hechos observados de inferencias.
 - Mantener `exploration.md` conciso: maximo 200 lineas.
 - Si hacés una pregunta al usuario, DETENERTE y esperar la respuesta. No continuar ni asumir respuestas.

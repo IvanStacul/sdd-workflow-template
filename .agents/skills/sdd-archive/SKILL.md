@@ -1,6 +1,6 @@
 ---
 name: sdd-archive
-description: "Cerrar un change, escribir retro obligatoria, propagar bugs o lecciones y sincronizar delta specs a la fuente de verdad. Usar cuando el usuario ejecuta /sdd:archive despues de verify."
+description: "Cerrar un change, escribir retro obligatoria, propagar bugs o lecciones y sincronizar delta specs a la fuente de verdad. Usar cuando el usuario ejecuta /sdd:archive después de verify."
 metadata:
   version: "2.0"
 ---
@@ -9,7 +9,7 @@ metadata:
 
 Cerrar el ciclo SDD de un change: escribir la retro obligatoria, sincronizar las delta specs a `openspec/specs/`, propagar bugs y lecciones, y mover el change a `openspec/changes/archive/`.
 
-Esta fase es la que transforma trabajo en curso en audit trail util para cambios futuros. Si se hace mal, se pierde trazabilidad o se corrompe la fuente de verdad.
+Esta fase es la que transforma trabajo en curso en audit trail útil para cambios futuros. Si se hace mal, se pierde trazabilidad o se corrompe la fuente de verdad.
 
 Sos un EJECUTOR - archiva directamente. NO lances subagentes.
 
@@ -17,13 +17,13 @@ Sos un EJECUTOR - archiva directamente. NO lances subagentes.
 
 - Nombre del change (opcional si hay uno solo activo).
 
-Si no se especifica nombre, buscar changes activos en `openspec/changes/`. Si hay exactamente uno, usarlo. Si hay varios, preguntar cuál. Siempre anunciar qué change se está archivando antes de empezar.
+Si no se específica nombre, buscar changes activos en `openspec/changes/`. Si hay exactamente uno, usarlo. Si hay varios, preguntar cuál. Siempre anunciar qué change se está archivando antes de empezar.
 
 ## Context Load
 
 Seguir `_shared/phase-common.md`.
 
-En la practica, eso implica leer config, reglas generales, `state.md` del change y devolver el envelope comun al final.
+En la práctica, eso implica leer config, reglas generales, `state.md` del change y devolver el envelope comun al final.
 
 Leer OBLIGATORIAMENTE:
 
@@ -57,7 +57,7 @@ Archivar con trabajo pendiente significa que esas tareas se pierden del flujo ac
 2. Cancelar y volver a apply
 ```
 
-Tambien verificar que existan los artefactos minimos de cierre:
+También verificar que existan los artefactos mínimos de cierre:
 
 - `verify-report.md`
 - `state.md`
@@ -69,7 +69,7 @@ La retro NO es opcional. Crear o actualizar `openspec/changes/{change-name}/retr
 
 Nombrar el template en este punto es importante: esta fase depende de ese asset para que la retro no quede reducida a texto libre sin bugs, lecciones o mejoras accionables.
 
-La retro debe incluir como minimo:
+La retro debe incluir como mínimo:
 
 - que salio bien
 - que salio mal
@@ -82,10 +82,10 @@ La retro debe incluir como minimo:
 
 Actualizar `docs/known-issues.md` y `docs/workflow-changelog.md` si existen.
 
-Propagacion esperada:
+Propagación esperada:
 
 - cada bug relevante de la retro debe quedar registrado en `docs/known-issues.md`
-- las lecciones deben registrarse con un tipo util (`Arquitectura`, `Flujo`, `Negocio`, `Tooling` o similar)
+- las lecciones deben registrarse con un tipo útil (`Arquitectura`, `Flujo`, `Negocio`, `Tooling` o similar)
 - las mejoras al workflow deben quedar en `docs/workflow-changelog.md`
 
 Si una mejora al flujo es concreta, de bajo riesgo y claramente correcta:
@@ -99,7 +99,7 @@ Si la mejora es compleja, riesgosa o requiere criterio humano:
 - dejarla como `propuesta`
 - no forzar el cambio durante archive
 
-Si `docs/known-issues.md` o `docs/workflow-changelog.md` no existen, no bloquear el archive solo por eso. Reportarlo como observacion y continuar.
+Si `docs/known-issues.md` o `docs/workflow-changelog.md` no existen, no bloquear el archive solo por eso. Reportarlo como observación y continuar.
 
 ### Step 4: Sincronizar delta specs a specs consolidadas
 
@@ -142,7 +142,7 @@ Esta parte debe ser cuidadosa porque `sdd-spec` ya exige bloques completos para 
 Antes de mover el directorio del change:
 
 - actualizar `state.md` siguiendo `_shared/phase-common.md`
-- registrar la retro y la sincronizacion de specs como parte del cierre
+- registrar la retro y la sincronización de specs como parte del cierre
 
 Una vez archivado el change, ese directorio pasa a ser inmutable.
 

@@ -35,6 +35,6 @@ Abstraer solo cuando hay beneficio concreto, no por principio DRY preventivo.
 | Anti-patrón | Alternativa |
 |-------------|-------------|
 | Service de 1 método usado en 1 lugar | Inline o función privada |
-| Helper "util" genérico que crece sin cohesión | Módulos con responsabilidad clara |
+| Helper "útil" genérico que crece sin cohesión | Módulos con responsabilidad clara |
 | Repository pattern sobre un ORM que ya lo provee | Usar el ORM directamente |
 | Abstraer "por si acaso" | YAGNI — extraer cuando se necesite |

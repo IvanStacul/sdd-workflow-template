@@ -71,8 +71,8 @@ Antes de ejecutar comandos del workflow que operan sobre `openspec/`, verificar 
 Regla general:
 
 1. Si no existe `openspec/config.yaml`, correr `sdd-init` primero.
-2. Si existe pero falta estructura minima (`openspec/specs/`, `openspec/changes/`), correr `sdd-init` en modo adopt.
-3. No preguntes al usuario si hay que inicializar cuando el comando ya depende de esa estructura; hacelo y despues continua.
+2. Si existe pero falta estructura mínima (`openspec/specs/`, `openspec/changes/`), correr `sdd-init` en modo adopt.
+3. No preguntes al usuario si hay que inicializar cuando el comando ya depende de esa estructura; hacelo y después continua.
 
 Excepciones explicitas:
 
@@ -85,7 +85,7 @@ Excepciones explicitas:
 explore (opcional)
     |
     v
-propose -> spec -> design (decision gate) -> tasks -> apply -> verify -> archive
+propose -> spec -> design (decisión gate) -> tasks -> apply -> verify -> archive
                                                      ^         |
                                                      |         v
                                                      +---------+
@@ -93,7 +93,7 @@ propose -> spec -> design (decision gate) -> tasks -> apply -> verify -> archive
 
 Ideas clave del grafo:
 
-- `sdd-design` funciona como gate despues de `sdd-spec`: la skill decide si hace falta `design.md` o si `sdd-tasks` puede seguir sin ese artefacto.
+- `sdd-design` funciona como gate después de `sdd-spec`: la skill decide si hace falta `design.md` o si `sdd-tasks` puede seguir sin ese artefacto.
 - `sdd-verify` puede devolver el change a `sdd-apply` si encuentra issues o tareas incompletas.
 - `sdd-archive` solo corre cuando verify deja al change realmente listo para cerrar.
 
@@ -112,7 +112,7 @@ Dependencias minimas por fase:
 
 ## Resolver la siguiente fase
 
-Cuando el orquestador necesita decidir que viene despues, usar este orden:
+Cuando el orquestador necesita decidir que viene después, usar este orden:
 
 1. Si el usuario pidio una utilidad pública explícita (`/sdd:onboard`, `/sdd:patch`, `/sdd:domain-brief`), ejecutar esa skill y no intentar forzar el flujo largo.
 2. Si el usuario pidio una fase puntual válida (`/sdd:explore`, `/sdd:propose`, `/sdd:apply`, `/sdd:verify`, `/sdd:archive`), respetar ese pedido, pero solo si las dependencias mínimas están listas.
@@ -121,7 +121,7 @@ Cuando el orquestador necesita decidir que viene despues, usar este orden:
 
 Heurística para `continue` y `ff`:
 
-| Situacion encontrada | Siguiente fase |
+| Situación encontrada | Siguiente fase |
 |----------------------|----------------|
 | No existe `proposal.md` | `sdd-propose` |
 | Existe `proposal.md` pero faltan specs del change | `sdd-spec` |

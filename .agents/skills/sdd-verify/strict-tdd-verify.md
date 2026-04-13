@@ -1,16 +1,16 @@
-# Strict TDD - Modulo Opcional de Verify
+# Strict TDD - Módulo Opcional de Verify
 
 Este archivo solo se carga si `testing.strict_tdd: true`.
 
 ## Objetivo
 
-Agregar controles extra para verificar que la implementacion no se salto el flujo de tests primero.
+Agregar controles extra para verificar que la implementación no se salto el flujo de tests primero.
 
-## Chequeos minimos
+## Chequeos mínimos
 
 - Los requirements cambiados deben tener tests relacionados.
 - La evidencia runtime no puede faltar para cambios de comportamiento.
-- Si hay implementacion sin tests asociados, reportar al menos `WARNING`.
+- Si hay implementación sin tests asociados, reportar al menos `WARNING`.
 
 ## Reglas
 

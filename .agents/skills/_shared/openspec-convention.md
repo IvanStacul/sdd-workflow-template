@@ -44,14 +44,14 @@ Ideas clave:
 En este workflow, `capability` y `domain` NO significan lo mismo:
 
 - `capability` = unidad de comportamiento que tiene su propia spec y puede crearse, modificarse o archivarse de forma trazable.
-- `domain` = area funcional mas amplia usada para explicar el sistema a nivel negocio o para agrupar capacidades relacionadas.
+- `domain` = area funcional más amplia usada para explicar el sistema a nivel negocio o para agrupar capacidades relacionadas.
 
 Por eso los paths de specs usan `NNN-capability`:
 
 - `openspec/specs/004-products/spec.md` representa UNA spec consolidada concreta.
-- esa spec puede pertenecer a un dominio mas amplio, por ejemplo `inventory`.
+- esa spec puede pertenecer a un dominio más amplio, por ejemplo `inventory`.
 
-Regla practica:
+Regla práctica:
 
 - si estas nombrando carpetas o archivos de specs, pensa en `capability`
 - si estas explicando el sistema para humanos, agrupando areas funcionales o escribiendo `domain-brief`, pensa en `domain`
@@ -76,7 +76,7 @@ namespaces:
     description: Productos, variantes y stock
 ```
 
-Si el proyecto no los necesita, `namespaces: []` es valido.
+Si el proyecto no los necesita, `namespaces: []` es válido.
 
 ## 4. Config Keys
 
@@ -93,13 +93,13 @@ Si el proyecto no los necesita, `namespaces: []` es valido.
 | `testing.test_command` | Comando principal de tests | Detectado o completado en `init` |
 | `testing.coverage_command` | Comando de cobertura | Opcional |
 | `testing.typecheck_command` | Comando de typecheck | Opcional |
-| `modules.skill_registry` | Si se resuelven skills de proyecto de forma automatica | Default recomendado `true` |
+| `modules.skill_registry` | Si se resuelven skills de proyecto de forma automática | Default recomendado `true` |
 | `modules.model_routing` | Si se usan modelos distintos por fase | Solo tiene efecto real con `agent_mode: multi` |
 | `rules.<fase>` | Reglas locales por fase | Complementan `_shared`, no lo reemplazan |
 
 Compatibilidad legacy:
 
-- Si todavia existen `tdd` o `test_command`, leerlos como fallback.
+- Si todavía existen `tdd` o `test_command`, leerlos como fallback.
 - El workflow nuevo debe escribir `testing.*`, no las claves legacy.
 
 ## 5. State.md - Formato
@@ -144,15 +144,15 @@ Compatibilidad legacy:
 | Skill | Crea o actualiza | Path principal |
 |-------|------------------|----------------|
 | `sdd-init` | Estructura y config | `openspec/config.yaml`, directorios, docs base |
-| `sdd-explore` | Exploracion opcional | `openspec/changes/{name}/exploration.md` |
+| `sdd-explore` | Exploración opcional | `openspec/changes/{name}/exploration.md` |
 | `sdd-propose` | Propuesta | `openspec/changes/{name}/proposal.md` |
 | `sdd-spec` | Delta specs del change | `openspec/changes/{name}/specs/{NNN-capability}/spec.md` |
-| `sdd-design` | Diseno tecnico | `openspec/changes/{name}/design.md` |
+| `sdd-design` | Diseño técnico | `openspec/changes/{name}/design.md` |
 | `sdd-tasks` | Plan de tareas | `openspec/changes/{name}/tasks.md` |
-| `sdd-apply` | Estado del plan y codigo | `tasks.md`, `state.md`, codigo del proyecto |
-| `sdd-verify` | Evidencia de verificacion | `openspec/changes/{name}/verify-report.md` |
+| `sdd-apply` | Estado del plan y código | `tasks.md`, `state.md`, código del proyecto |
+| `sdd-verify` | Evidencia de verificación | `openspec/changes/{name}/verify-report.md` |
 | `sdd-archive` | Retro, sync a specs y archive | `retro.md`, `openspec/specs/...`, `openspec/changes/archive/...` |
-| `sdd-patch` | Documento unico del patch | `openspec/changes/archive/{name}/patch.md` |
+| `sdd-patch` | Documento único del patch | `openspec/changes/archive/{name}/patch.md` |
 | `domain-brief` | Resumen funcional | `docs/domain-brief.md` |
 
 ## 7. Reglas de Escritura
@@ -160,7 +160,7 @@ Compatibilidad legacy:
 - Crear el directorio del change ANTES de escribir artefactos.
 - Si un archivo ya existe, LEERLO primero y ACTUALIZARLO (NO sobrescribir).
 - Si el directorio del change ya tiene artefactos, el change se está CONTINUANDO.
-- Usar `openspec/config.yaml` seccion `rules` para reglas locales por fase cuando existan.
-- Archivar solo despues de sincronizar delta specs y de escribir `retro.md`.
+- Usar `openspec/config.yaml` sección `rules` para reglas locales por fase cuando existan.
+- Archivar solo después de sincronizar delta specs y de escribir `retro.md`.
 - El archive es inmutable.
 - Los cambios a templates son forward-only: mejoran artefactos nuevos, no reescriben los ya existentes.

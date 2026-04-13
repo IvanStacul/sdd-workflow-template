@@ -1,4 +1,4 @@
-# Strict TDD - Modulo Opcional de Apply
+# Strict TDD - Módulo Opcional de Apply
 
 Este archivo solo se carga si `testing.strict_tdd: true`.
 
@@ -7,10 +7,10 @@ Este archivo solo se carga si `testing.strict_tdd: true`.
 Seguir el ciclo:
 
 1. Red: escribir prueba que falle
-2. Green: implementar lo minimo para que pase
+2. Green: implementar lo mínimo para que pase
 3. Refactor: ordenar sin cambiar comportamiento
 
-## Evidencia minima
+## Evidencia mínima
 
 Cuando uses strict TDD, dejar evidencia en el resumen de la fase:
 
@@ -21,5 +21,5 @@ Cuando uses strict TDD, dejar evidencia en el resumen de la fase:
 
 ## Reglas
 
-- No saltes directo a implementacion.
-- Si no pudiste escribir tests primero, reportarlo como desviacion.
+- No saltes directo a implementación.
+- Si no pudiste escribir tests primero, reportarlo como desviación.

@@ -60,7 +60,7 @@ If you cannot answer these with specifics, stop. Ask the user. Do not guess. Do 
 
 ## Every Choice Must Be A Choice
 
-For every decision, you must be able to explain WHY.
+For every decisión, you must be able to explain WHY.
 
 - Why this layout and not another?
 - Why this color temperature?
@@ -82,7 +82,7 @@ When you design from defaults, everything looks the same because defaults are sh
 
 ## Intent Must Be Systemic
 
-Saying "warm" and using cold colors is not following through. Intent is not a label — it's a constraint that shapes every decision.
+Saying "warm" and using cold colors is not following through. Intent is not a label — it's a constraint that shapes every decisión.
 
 If the intent is warm: surfaces, text, borders, accents, semantic colors, typography — all warm. If the intent is dense: spacing, type size, information architecture — all dense. If the intent is calm: motion, contrast, color saturation — all calm.
 

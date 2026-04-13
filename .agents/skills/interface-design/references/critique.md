@@ -6,7 +6,7 @@ Your first build shipped the structure. Now look at it the way a design lead rev
 
 ## The Gap
 
-There's a distance between correct and crafted. Correct means the layout holds, the grid aligns, the colors don't clash. Crafted means someone cared about every decision down to the last pixel. You can feel the difference immediately — the way you tell a hand-thrown mug from an injection-molded one. Both hold coffee. One has presence.
+There's a distance between correct and crafted. Correct means the layout holds, the grid aligns, the colors don't clash. Crafted means someone cared about every decisión down to the last pixel. You can feel the difference immediately — the way you tell a hand-thrown mug from an injection-molded one. Both hold coffee. One has presence.
 
 Your first output lives in correct. This command pulls it toward crafted.
 
@@ -28,7 +28,7 @@ Is there a clear focal point? Every screen has one thing the user came here to d
 
 Move close. Pixel-close.
 
-The spacing grid is non-negotiable — every value a multiple of 4, no exceptions — but correctness alone isn't craft. Craft is knowing that a tool panel at 16px padding feels workbench-tight while the same card at 24px feels like a brochure. The same number can be right in one context and lazy in another. Density is a design decision, not a constant.
+The spacing grid is non-negotiable — every value a multiple of 4, no exceptions — but correctness alone isn't craft. Craft is knowing that a tool panel at 16px padding feels workbench-tight while the same card at 24px feels like a brochure. The same number can be right in one context and lazy in another. Density is a design decisión, not a constant.
 
 Typography should be legible even squinted. If size is the only thing separating your headline from your body from your label, the hierarchy is too weak. Weight, tracking, and opacity create layers that size alone can't.
 

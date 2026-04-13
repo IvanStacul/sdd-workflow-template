@@ -65,7 +65,7 @@ Regla de compactacion:
 
 ## Cuando inyectar
 
-Inyectar solo a fases que tocan codigo o definen estructura:
+Inyectar solo a fases que tocan código o definen estructura:
 
 - `sdd-design`
 - `sdd-tasks`
@@ -80,7 +80,7 @@ Normalmente no hace falta inyectar a:
 - `sdd-patch`
 - `domain-brief`
 
-`sdd-init` puede usar este modulo para detectar que skills de proyecto existen, pero no necesita inyectar reglas compactadas a otra fase porque todavia esta armando el contexto.
+`sdd-init` puede usar este módulo para detectar que skills de proyecto existen, pero no necesita inyectar reglas compactadas a otra fase porque todavía está armando el contexto.
 
 ## Matching por contexto
 
@@ -94,7 +94,7 @@ Ejemplos:
 - Infraestructura -> `infra`
 - Si no matchea nada especifico -> `general`
 
-## Formato de inyeccion
+## Formato de inyección
 
 El coordinador puede agregar este bloque antes de la skill de fase:
 
@@ -109,14 +109,14 @@ El coordinador puede agregar este bloque antes de la skill de fase:
 
 El coordinador o la fase deben reflejar uno de estos estados:
 
-- `disabled`: el modulo esta apagado.
-- `direct`: el modulo estaba disponible, pero no hizo falta inyectar nada adicional.
+- `disabled`: el módulo está apagado.
+- `direct`: el módulo estaba disponible, pero no hizo falta inyectar nada adicional.
 - `injected`: se inyectaron reglas compactadas.
-- `fallback`: hubo que releer skills o inferir reglas porque falto resolucion previa.
+- `fallback`: hubo que releer skills o inferir reglas porque faltó resolución previa.
 
 ## Rules
 
 - No dependas de memoria externa ni de backends propietarios.
 - Si existe un registro consolidado, usarlo antes de escanear todo el repo.
-- Si una skill de proyecto contradice una regla generica de `_shared/`, la skill de proyecto tiene prioridad porque es mas especifica.
+- Si una skill de proyecto contradice una regla genérica de `_shared/`, la skill de proyecto tiene prioridad porque es más específica.
 - Si el stack detectado sugiere que falta una skill importante, reportarlo como oportunidad de mejora en `init`, `onboard` o en el resumen de la fase.

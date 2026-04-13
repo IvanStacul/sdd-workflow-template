@@ -44,7 +44,7 @@ Leer `proposal.md` y separar:
 - **Capabilities nuevas** -> cada una genera una spec completa nueva.
 - **Capabilities modificadas** -> cada una genera una delta spec que referencia una spec consolidada existente.
 
-Si `proposal.md` no deja suficientemente clara esta separacion, corregir la ambiguedad en la propuesta o devolver riesgo explicito. No inventes mappings silenciosos.
+Si `proposal.md` no deja suficientemente clara esta separación, corregir la ambigüedad en la propuesta o devolver riesgo explícito. No inventes mappings silenciosos.
 
 ### Step 2: Resolver numeración y paths
 
@@ -52,12 +52,12 @@ Para cada capability:
 
 - **Nueva**:
   - crear `openspec/changes/{change-name}/specs/{NNN-capability}/spec.md`
-  - `NNN` es el siguiente numero libre en `openspec/specs/`
+  - `NNN` es el siguiente número libre en `openspec/specs/`
 - **Modificada**:
   - reutilizar el `NNN` ya existente en `openspec/specs/{NNN-capability}/spec.md`
   - crear o actualizar `openspec/changes/{change-name}/specs/{NNN-capability}/spec.md`
 
-Si una capability marcada como modificada no existe en `openspec/specs/`, no sigas como si nada. Corregi la propuesta o marca el riesgo explicitamente antes de escribir una delta inconsistente.
+Si una capability marcada como modificada no existe en `openspec/specs/`, no sigas como si nada. Corregi la propuesta o marca el riesgo explícitamente antes de escribir una delta inconsistente.
 
 ### Step 3: Leer specs vigentes cuando haya deltas
 
@@ -69,7 +69,7 @@ El objetivo de este paso es entender el comportamiento vigente para poder escrib
 
 #### 4.1 Capabilities nuevas -> spec completa
 
-Usar `assets/spec.template.md` como template base. El template existe para que no queden secciones huerfanas ni formato divergente entre specs nuevas.
+Usar `assets/spec.template.md` como template base. El template existe para que no queden secciones huérfanas ni formato divergente entre specs nuevas.
 
 Cada spec nueva debe incluir:
 
@@ -90,22 +90,22 @@ Usar este formato:
 ## ADDED Requirements
 
 ### Requirement: {Nombre}
-{Descripcion}
+{Descripción}
 
 #### Scenario: {nombre}
 - GIVEN {precondicion}
-- WHEN {accion}
+- WHEN {acción}
 - THEN {resultado esperado}
 
 ## MODIFIED Requirements
 
 ### Requirement: {Nombre Existente}
 {Texto COMPLETO actualizado}
-(Previously: {resumen de lo que era antes, en una linea})
+(Previously: {resumen de lo que era antes, en una línea})
 
 #### Scenario: {escenario}
 - GIVEN {precondicion}
-- WHEN {accion}
+- WHEN {acción}
 - THEN {resultado esperado}
 
 ## REMOVED Requirements
@@ -120,7 +120,7 @@ Usar este formato:
 |------|-------------------------|-----------------|
 ```
 
-#### 4.3 Workflow critico para `MODIFIED Requirements`
+#### 4.3 Workflow crítico para `MODIFIED Requirements`
 
 Cuando una requirement existente cambia, seguir este flujo exacto:
 
@@ -132,14 +132,14 @@ Cuando una requirement existente cambia, seguir este flujo exacto:
 
 Esto es obligatorio porque `sdd-archive` necesita un bloque completo para reemplazar el requirement consolidado sin perder scenarios previos.
 
-### Step 5: Validar cobertura minima
+### Step 5: Validar cobertura mínima
 
 Antes de cerrar la fase, revisar:
 
 - cada requirement tiene al menos un scenario
 - todos los scenarios usan Given/When/Then
 - `Edge Cases` existe en cada spec del change
-- la spec describe comportamiento, no implementacion
+- la spec describe comportamiento, no implementación
 - las delta specs distinguen claramente `ADDED`, `MODIFIED` y `REMOVED`
 
 ### Step 6: Registrar fase
@@ -166,7 +166,7 @@ risks:
 skill_resolution: disabled | direct | injected | fallback
 ```
 
-`sdd-design` y `sdd-tasks` son fases internas del flujo. La necesidad de pasar por `sdd-design` depende de si todavia faltan decisiones estructurales.
+`sdd-design` y `sdd-tasks` son fases internas del flujo. La necesidad de pasar por `sdd-design` depende de si todavía faltan decisiones estructurales.
 
 ## Rules
 
@@ -175,7 +175,7 @@ skill_resolution: disabled | direct | injected | fallback
 - `Edge Cases` es obligatorio.
 - Cada requirement debe tener al menos un scenario.
 - Los scenarios deben ser testeables.
-- No meter implementacion en la spec.
+- No meter implementación en la spec.
 - En `MODIFIED`, copiar y editar el bloque completo.
 - Si agregas comportamiento nuevo sin cambiar lo existente, usar `ADDED`, no `MODIFIED`.
 - Si continuas una spec ya empezada, leerla antes de actualizarla.

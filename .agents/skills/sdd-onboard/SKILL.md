@@ -7,7 +7,7 @@ metadata:
 
 ## Purpose
 
-Guiar al usuario por el workflow SDD completo usando el repo real como ejemplo. No es una explicacion teorica aislada: cada paso debe anclarse en archivos, specs o código del proyecto actual.
+Guiar al usuario por el workflow SDD completo usando el repo real como ejemplo. No es una explicación teórica aislada: cada paso debe anclarse en archivos, specs o código del proyecto actual.
 
 Sos un EJECUTOR. NO lances subagentes.
 
@@ -30,23 +30,23 @@ Leer:
 
 Si falta `openspec/config.yaml`, explicar que onboarding puede dar una vista general, pero que el primer paso real del workflow es `sdd-init`.
 
-Si el usuario quiere seguir operando el flujo sobre el repo, correr `sdd-init` primero y despues continuar con el onboarding.
+Si el usuario quiere seguir operando el flujo sobre el repo, correr `sdd-init` primero y después continuar con el onboarding.
 
 ### Step 2: Explicar fases
 
-Explicar el flujo distinguiendo claramente comandos publicos de fases internas.
+Explicar el flujo distinguiendo claramente comandos públicos de fases internas.
 
 Usar esta idea base:
 
 - `/sdd:new <nombre>` es la puerta de entrada normal al flujo completo
 - ese flujo recorre `propose -> spec -> design (si aplica) -> tasks -> apply -> verify -> archive`
-- `propose`, `spec`, `design` y `tasks` existen como fases del workflow, aunque no siempre existan como comandos publicos separados
+- `propose`, `spec`, `design` y `tasks` existen como fases del workflow, aunque no siempre existan como comandos públicos separados
 - `/sdd:continue` y `/sdd:ff` sirven para retomar o avanzar un change ya abierto
 - `/sdd:explore` sirve para investigar antes de proponer
-- `/sdd:patch` es un atajo publico para cambios chicos con un unico `patch.md`
+- `/sdd:patch` es un atajo público para cambios chicos con un único `patch.md`
 - `/sdd:domain-brief` no es una fase del change: regenera `docs/domain-brief.md` desde specs consolidadas
 
-Si existe `docs/workflow-guide.md`, usarlo como apoyo pedagogico para que la explicacion siga el flujo publico real del repo.
+Si existe `docs/workflow-guide.md`, usarlo como apoyo pedagógico para que la explicación siga el flujo público real del repo.
 
 ### Step 3: Proponer un mini ejercicio
 
@@ -54,38 +54,38 @@ Buscar algo pequeno y real del repo:
 
 - edge case faltante
 - TODO
-- validacion chica
+- validación chica
 - mejora documental acotada
 
 Priorizar, en este orden:
 
 1. edge case o aclaracion chica sobre una spec existente
 2. TODO o bug acotado que pueda resolverse con `patch`
-3. validacion o mejora chica del codigo
-4. mejora documental puntual si no hay mejor ejemplo tecnico
+3. validación o mejora chica del código
+4. mejora documental puntual si no hay mejor ejemplo técnico
 
-Presentar el ejercicio explicando por que conviene usar `/sdd:patch` o `/sdd:new <nombre>` segun el alcance.
+Presentar el ejercicio explicando por que conviene usar `/sdd:patch` o `/sdd:new <nombre>` según el alcance.
 
 ### Step 4: Guiar paso a paso
 
 Si el usuario acepta, ejecutar el flujo elegido PASO A PASO.
 
-Despues de cada paso o fase:
+Después de cada paso o fase:
 
 - explicar que se hizo
 - mostrar artefactos generados
 - esperar confirmacion del usuario
 
-No saltees de una fase a otra como si el onboarding fuera una automatizacion muda. El objetivo es que el usuario entienda que paso y por que.
+No saltees de una fase a otra como si el onboarding fuera una automatización muda. El objetivo es que el usuario entienda que paso y por que.
 
 ### Step 5: Cerrar con resumen operativo
 
 Al terminar el onboarding, resumir:
 
 - que artefactos se generaron o revisaron
-- que comando uso el usuario o que comando deberia usar la proxima vez
+- que comando uso el usuario o que comando debería usar la próxima vez
 - cuando conviene `patch` y cuando conviene el flujo completo
-- cual es el siguiente paso recomendado para seguir practicando
+- cuál es el siguiente paso recomendado para seguir practicando
 
 ## Persistence
 

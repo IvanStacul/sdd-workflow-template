@@ -16,15 +16,15 @@ _Ninguno registrado._
 _Ninguno registrado._
 
 <!-- Formato para nuevas entradas:
-### BUG-NNN: {titulo}
+### BUG-NNN: {título}
 - **Estado**: Activo | Resuelto
 - **Detectado en**: {change-name}
-- **Fase**: {fase donde ocurrio}
-- **Descripcion**: {que paso}
+- **Fase**: {fase donde ocurrió}
+- **Descripción**: {que paso}
 - **Causa raiz**: {por que paso}
-- **Solucion**: {que se hizo}
-- **Prevencion**: {que cambio al flujo evita que vuelva a pasar}
-- **Prevencion aplicada**: {si/no - que skill se modifico}
+- **Solución**: {que se hizo}
+- **Prevención**: {que cambio al flujo evita que vuelva a pasar}
+- **Prevención aplicada**: {si/no - que skill se modificó}
 -->
 
 ---
@@ -33,29 +33,29 @@ _Ninguno registrado._
 
 ### Arquitectura
 
-| ID | Leccion | Origen | Accion tomada |
+| ID | Lección | Origen | Acción tomada |
 |----|---------|--------|---------------|
 
 ### Flujo de trabajo
 
-| ID | Leccion | Origen | Accion tomada |
+| ID | Lección | Origen | Acción tomada |
 |----|---------|--------|---------------|
 
 ### Negocio
 
-| ID | Leccion | Origen | Accion tomada |
+| ID | Lección | Origen | Acción tomada |
 |----|---------|--------|---------------|
 
 ### Tooling
 
-| ID | Leccion | Origen | Accion tomada |
+| ID | Lección | Origen | Acción tomada |
 |----|---------|--------|---------------|
 
 ---
 
-## Estadisticas
+## Estadísticas
 
-| Metrica | Valor |
+| Métrica | Valor |
 |---------|-------|
 | Total bugs registrados | 0 |
 | Bugs -> cambio de flujo | 0 |

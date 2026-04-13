@@ -33,20 +33,20 @@ Leer OBLIGATORIAMENTE:
 
 Si `openspec/config.yaml` define `rules.tasks`, tratarlas como reglas locales de esta fase. Pueden agregar formato, criterios de granularidad o checks adicionales; complementan esta skill, no la reemplazan.
 
-La referencia a `_shared/abstraction-guide.md` sirve para decidir si conviene separar archivos, helpers o servicios en las tareas. Aun asi, la skill debe dejar una explicacion local de por que se parte el trabajo como se parte.
+La referencia a `_shared/abstraction-guide.md` sirve para decidir si conviene separar archivos, helpers o servicios en las tareas. Aun asi, la skill debe dejar una explicación local de por que se parte el trabajo como se parte.
 
 ## Steps
 
 ### Step 1: Agrupar por fases
 
-Separar el plan por bloques coherentes de implementacion. El objetivo no es inventar fases ceremoniales, sino ordenar el trabajo de manera que `sdd-apply` pueda tomar un lote sin romper dependencias.
+Separar el plan por bloques coherentes de implementación. El objetivo no es inventar fases ceremoniales, sino ordenar el trabajo de manera que `sdd-apply` pueda tomar un lote sin romper dependencias.
 
 Usar grupos como:
 
 - infraestructura
-- implementacion
+- implementación
 - integracion
-- verificacion o limpieza, si aplica
+- verificación o limpieza, si aplica
 
 Si el change es chico, no fuerces cuatro fases. Pocas fases claras son mejores que una taxonomia artificial.
 
@@ -54,7 +54,7 @@ Si el change es chico, no fuerces cuatro fases. Pocas fases claras son mejores q
 
 Crear o actualizar `openspec/changes/{change-name}/tasks.md` usando `assets/tasks.template.md`.
 
-Ese template debe nombrarse explicitamente aca porque la skill depende de su estructura. `sdd-apply` usa `tasks.md` como continuidad entre lotes y espera el formato de checklist `- [ ]`.
+Ese template debe nombrarse explícitamente aca porque la skill depende de su estructura. `sdd-apply` usa `tasks.md` como continuidad entre lotes y espera el formato de checklist `- [ ]`.
 
 Cada tarea debe incluir:
 
@@ -70,7 +70,7 @@ Formato esperado por tarea:
 - [ ] 1.1 {Descripción de la tarea} `[REQ-XX]`
   - **Archivos**: `path/to/file.ext`
   - **Depende de**: -
-  - **Criterio**: {cuando esta completa, de forma verificable}
+  - **Criterio**: {cuando está completa, de forma verificable}
 ```
 
 Puntos clave:
@@ -81,7 +81,7 @@ Puntos clave:
 - `**Depende de**` define el orden entre lotes
 - `**Criterio**` define cuando puede marcarse `[x]`
 
-Si no existe `design.md`, las tareas igual deben quedar claras a partir de specs. No inventes una pseudo-seccion de design dentro de `tasks.md`: si faltan decisiones estructurales reales, eso es una observación para volver a `sdd-design`, no algo para esconder en el plan.
+Si no existe `design.md`, las tareas igual deben quedar claras a partir de specs. No inventes una pseudo-sección de design dentro de `tasks.md`: si faltan decisiones estructurales reales, eso es una observación para volver a `sdd-design`, no algo para esconder en el plan.
 
 ### Step 3: Validar tamaño
 

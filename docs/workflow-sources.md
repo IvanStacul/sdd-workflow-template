@@ -1,6 +1,6 @@
 ﻿# Fuentes del Workflow SDD
 
-Este documento no explica como usar el workflow dia a dia. Para eso, la guia operativa es `docs/workflow-guide.md`.
+Este documento no explica como usar el workflow dia a dia. Para eso, la guía operativa es `docs/workflow-guide.md`.
 
 Aca se resume que se adopta y que se descarta de las referencias externas que inspiraron este template.
 
@@ -10,13 +10,13 @@ Aca se resume que se adopta y que se descarta de las referencias externas que in
 |--------|-----------|------------|
 | OpenSpec | `openspec/specs/`, `openspec/changes/`, delta specs y `archive/` como merge a la fuente de verdad | Depender de CLI, perfiles globales o estado fuera del repo para entender el flujo |
 | gentle-ai | Orquestacion capability-aware, coordinacion por fases, subagentes, personalidad y envelope comun de retorno | Memoria externa, almacenamiento hibrido y dependencias en backends |
-| agent-skills | Anatomia de skills, quality gates, evidencia verificable y modulos opt-in | Reemplazar el workflow por un catalogo generico de skills sin contrato entre fases |
+| agent-skills | Anatomia de skills, quality gates, evidencia verificable y modulos opt-in | Reemplazar el workflow por un catalogo genérico de skills sin contrato entre fases |
 
 ## Consecuencias concretas en este template
 
 - `.agents/` es la fuente de verdad operativa del workflow.
-- La interfaz publica se expone como comandos `/sdd:*`.
-- `propose`, `spec`, `design` y `tasks` siguen existiendo como fases internas, aunque no se documenten como comandos publicos separados.
+- La interfaz pública se expone como comandos `/sdd:*`.
+- `propose`, `spec`, `design` y `tasks` siguen existiendo como fases internas, aunque no se documenten como comandos públicos separados.
 - Todo el estado durable vive en archivos Markdown dentro del repo.
 - `docs/` explica y contextualiza; no reemplaza el contrato operativo de `.agents/`.
 

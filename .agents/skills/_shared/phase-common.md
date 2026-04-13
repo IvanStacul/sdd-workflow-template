@@ -22,7 +22,7 @@ Antes de cualquier acción, leer en este orden:
 5. `docs/known-issues.md` si existen bug conocidos y lecciones relevantes para la fase.
 6. `docs/workflow-changelog.md` solo si la fase necesita mejorar el workflow o archivar un change.
 
-Si un archivo opcional no existe, continuar y reportarlo como observacion, no como error fatal.
+Si un archivo opcional no existe, continuar y reportarlo como observación, no como error fatal.
 
 ### Project Standards auto-resolved
 

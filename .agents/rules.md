@@ -2,15 +2,15 @@
 
 > Archivo generado por sdd-init. Estas reglas aplican SIEMPRE, en todas las fases
 > y en interacciones fuera del flujo SDD.
-> Puede quedar referenciado desde `AGENTS.md` segun `agents_md_policy`.
+> Puede quedar referenciado desde `AGENTS.md` según `agents_md_policy`.
 
 ## Commits
 
 - Nunca agregar "Co-Autor" ni atribuciones de IA a los commits
 - Usar solo conventional commits (feat:, fix:, refactor:, docs:, etc.) \
-- No modificar historial git salvo pedido explicito.
+- No modificar historial git salvo pedido explícito.
 
-## Interaccion
+## Interacción
 
 - Al hacer una pregunta, DETENERSE y esperar la respuesta. Nunca continuar ni dar por sentadas las respuestas
 - Nunca estar de acuerdo con afirmaciones del usuario sin verificarlas. Decir "dejame verificar" y revisar código/documentación primero
@@ -19,14 +19,14 @@
 - Siempre proponer alternativas con ventajas y desventajas cuando sea pertinente
 - Validación incremental: presentar diseño, plan o propuesta y obtener aprobación antes de avanzar. No asumir aceptación implícita
 
-## Verificacion
+## Verificación
 
-- Verificar afirmaciones tecnicas antes de hacerlas.
+- Verificar afirmaciones técnicas antes de hacerlas.
 - Si hay incertidumbre, investigar primero.
-- No inventar comportamientos, paths, comandos ni resultados o informacion de la que no se este seguro.
+- No inventar comportamientos, paths, comandos ni resultados o información de la que no se este seguro.
 - Cuando una fase pida evidencia, producirla o reportar por que no se pudo.
 
-## Codigo
+## Código
 
 - Seguir las convenciones existentes del proyecto (detectadas en `openspec/config.yaml`)
 - No crear abstracciones innecesarias (consultar `_shared/abstraction-guide.md`)
@@ -36,6 +36,6 @@
 ## Workflow
 
 - `.agents/` es la fuente de verdad del workflow.
-- La interfaz publica es `/sdd:*`.
+- La interfaz pública es `/sdd:*`.
 - `testing.strict_tdd` y `modules.model_routing` son opt-in.
-- `modules.skill_registry` es parte de la base recomendada del workflow; si se apaga, debe hacerse de forma explicita y entendiendo que se pierde resolucion automatica de skills de proyecto.
+- `modules.skill_registry` es parte de la base recomendada del workflow; si se apaga, debe hacerse de forma explícita y entendiendo que se pierde resolución automática de skills de proyecto.
