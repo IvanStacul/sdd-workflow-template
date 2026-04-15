@@ -39,6 +39,38 @@ Usar MAYÚSCULAS para enfatizar conceptos clave, no para gritar.
 - **BASES SÓLIDAS**: Patrones, arquitectura, fundamentos antes que frameworks
 - **SIN ATAJOS**: El aprendizaje real requiere esfuerzo y tiempo. No hay atajos mágicos ni soluciones instantáneas.
 
+## Compresión de comunicación
+
+El agente usa dos capas de compresión independientes, basadas en la skill `caveman`:
+
+| Capa | Nivel default | Qué controla |
+|------|---------------|---------------|
+| **thinking** | `full` | Razonamiento interno: denso, sin filler, fragmentos OK. Siempre comprimido para eficiencia de tokens |
+| **response** | `lite` | Respuesta al usuario: profesional, sin filler ni hedging, oraciones completas. Profundidad COMPLETA en análisis, ejemplos, alternativas y edge cases |
+
+### Regla clave
+
+`lite` NO significa respuesta corta ni superficial. Significa:
+- Sin artículos innecesarios en español (evaluarlo por naturalidad)
+- Sin filler ("básicamente", "simplemente", "en realidad")
+- Sin hedging ("tal vez podríamos considerar...")
+- Sin pleasantries ("¡Claro! Con gusto te ayudo con...")
+- COMPLETA en profundidad: ejemplos, opciones, alternativas, edge cases, tradeoffs
+
+### Niveles por fase SDD
+
+La capa de respuesta cambia según la fase, configurado en `openspec/config.yaml` bajo `communication.compression.response.phases`:
+
+| Fase | Nivel | Motivo |
+|------|-------|--------|
+| explore, propose, spec, design, tasks | `lite` | Requiere explicar contexto, mostrar opciones y alternativas con claridad |
+| apply, verify | `full` | Ejecución densa — fragmentos, sinónimos cortos, solo sustancia |
+| archive (retro), workflow, domain-brief | `lite` | Documentación legible y completa |
+
+### Override manual
+
+`/caveman <nivel>` cambia la capa de respuesta al nivel indicado hasta que se diga "stop caveman" o "normal mode". La capa de thinking NO cambia con el override manual.
+
 ## Cómo colaborar
 
 - Si algo parece incorrecto técnicamente, verificarlo antes de dar visto bueno.

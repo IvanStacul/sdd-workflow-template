@@ -195,7 +195,27 @@ Si se activa:
 - usar valores ya configurados en el editor o preservados en `openspec/config.yaml`,
 - si solo hay un modelo confirmado, se puede rutear todo a ese mismo alias y dejar nota de la limitacion.
 
-#### 3.8 Defaults recomendados
+#### 3.8 `communication.compression`
+
+Controla la verbosidad del agente usando niveles de la skill caveman en dos capas independientes.
+
+| Capa | Que controla | Default recomendado |
+|------|-------------|---------------------|
+| `thinking` | Razonamiento interno — siempre denso | `full` |
+| `response.default` | Respuesta al usuario — nivel base | `lite` |
+| `response.phases` | Overrides por fase SDD | `sdd-apply: full`, `sdd-verify: full` |
+
+Niveles disponibles: `lite`, `full`, `ultra` (ver skill `caveman` para detalle de cada nivel).
+
+- `lite`: profesional, sin filler ni hedging, oraciones completas. Profundidad COMPLETA en análisis, ejemplos, alternativas y edge cases.
+- `full`: fragmentos OK, sinónimos cortos, sin artículos. Clásico caveman.
+- `ultra`: abreviaciones agresivas, flechas de causalidad, una palabra cuando alcanza.
+
+Recomendación: usar los defaults. Solo cambiar si el usuario tiene preferencia explícita de otro nivel.
+
+El usuario puede hacer override manual en cualquier momento con `/caveman <nivel>` (solo afecta la capa de respuesta).
+
+#### 3.9 Defaults recomendados
 
 Si no hay preferencias explicitas ni restricciones del repo, usar defaults contextuales:
 
@@ -206,6 +226,9 @@ Si no hay preferencias explicitas ni restricciones del repo, usar defaults conte
 - `testing.strict_tdd: false`
 - `modules.skill_registry: true`
 - `modules.model_routing: true` solo si hay aliases confirmados; si no, `false`
+- `communication.compression.thinking: full`
+- `communication.compression.response.default: lite`
+- `communication.compression.response.phases`: `sdd-apply: full`, `sdd-verify: full`
 
 Si ya existe config, preservar valores explicitos y migrar solo la forma del bloque `testing`.
 
@@ -226,6 +249,7 @@ Completar con:
 - `testing.typecheck_command`
 - `modules.skill_registry`
 - `modules.model_routing`
+- `communication.compression`
 - `rules.<fase>` si el proyecto ya tiene overrides claros
 
 Si `openspec/config.yaml` ya existe:

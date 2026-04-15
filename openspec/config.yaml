@@ -65,6 +65,22 @@ modules:
   skill_registry: true
   model_routing: true
 
+# Compresión de comunicación.
+# Usa niveles de la skill caveman para ajustar verbosidad por capa.
+# thinking: nivel para razonamiento interno (siempre denso, sin filler)
+# response.default: nivel base para respuestas al usuario
+# response.phases: overrides por fase SDD (las no listadas usan default)
+# Niveles disponibles: lite, full, ultra (ver skill caveman)
+# Override manual: /caveman <nivel> cambia solo la capa de respuesta
+communication:
+  compression:
+    thinking: full
+    response:
+      default: lite
+      phases:
+        sdd-apply: full
+        sdd-verify: full
+
 # Overrides por fase
 rules:
   spec:
