@@ -243,6 +243,21 @@ Interpretación mínima:
 - Mantener el hilo principal delgado: coordinar, sintetizar y decidir.
 - Mantener consistencia con las skills y con la interfaz pública documentada en `README.md` y `docs/workflow-guide.md`.
 
+### Phase guard
+
+Antes de lanzar cualquier fase, verificar que `state.md` no contradice la acción solicitada. Si el usuario pide ejecutar una fase pero `state.md` indica que el change debería estar en otra fase (ejemplo: verify devolvió el change a apply, pero el usuario pide verify de nuevo), **DETENERSE INMEDIATAMENTE** y avisar:
+
+```
+⛔ El estado del change indica que la fase correcta es {fase esperada}, no {fase solicitada}.
+Motivo: {resumen del state.md}
+```
+
+No ejecutar la fase incorrecta. No producir artefactos. El usuario puede:
+1. Ejecutar la fase correcta primero
+2. Explicar por qué quiere saltear (el coordinador evalúa si es válido)
+
+Esta guarda aplica especialmente al loop apply ↔ verify, pero es genérica para cualquier fase.
+
 ## Resumen de progreso entre fases
 
 Cuando el orquestador se detiene entre fases (en modo `interactive`, o al completar una fase en `auto` antes de seguir), mostrar un bloque compacto de progreso. El objetivo es que el usuario sepa dónde está parado sin tener que leer `state.md`.

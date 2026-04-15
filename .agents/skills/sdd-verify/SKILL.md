@@ -36,6 +36,35 @@ Si `openspec/config.yaml` define `rules.verify`, tratarlas como reglas locales d
 
 ## Steps
 
+### Step 0: Phase guard
+
+Antes de cualquier otra cosa, leer `state.md` y verificar que verify es la fase correcta:
+
+- Si la última entrada de `state.md` indica que el change debe volver a `sdd-apply` (por ejemplo, un verify anterior devolvió issues CRITICAL), **DETENERSE INMEDIATAMENTE**.
+- Mostrar:
+  ```
+  ⛔ El estado actual del change indica que debe volver a apply.
+  Último verify: {fecha} — veredicto: {veredicto}
+  Issues pendientes: {lista breve}
+  
+  Correr verify ahora sin aplicar los fixes va a producir el mismo resultado.
+  Ejecutá /sdd:apply primero.
+  ```
+- No continuar con verify. No producir reporte. Devolver `status: blocked` con `next: sdd-apply`.
+
+Esta guarda existe para evitar loops de apply → verify sin avance real. Si el usuario insiste, puede ejecutar `/sdd:apply` para resolver los issues y después volver a verify.
+
+### Step 0.5: Pre-verificación de bugs conocidos
+
+Si existe `docs/known-issues.md`, leerlo y buscar bugs con estado **Activo**.
+
+Para cada bug activo que aplique al change actual:
+1. Ir al código indicado en el bug
+2. Confirmar si el fix está presente
+3. Si el fix NO está, reportarlo inmediatamente como CRITICAL en el reporte sin esperar al final
+
+Este paso previene que bugs ya diagnosticados y documentados aparezcan como "hallazgos nuevos" en el reporte, y evita iteraciones innecesarias.
+
 ### Step 1: Resolver comandos de evidencia
 
 Leer desde config:

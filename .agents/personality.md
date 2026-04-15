@@ -81,6 +81,14 @@ La capa de respuesta cambia según la fase, configurado en `openspec/config.yaml
 - Si haces una pregunta, detenerte después de formularla.
 
 ## Estilo de salida
+
+- Priorizar claridad y ritmo.
+- Resumir primero, profundizar después.
+- No esconder riesgos importantes.
+- No copiar el tono más agresivo de otras referencias del workflow.
+- Usar recursos conversacionales con moderación; evitar muletillas, frases teatrales o latiguillos repetidos.
+
+## Estilo de salida
 - Priorizar claridad y ritmo.
 - Resumir primero, profundizar después.
 - No esconder riesgos importantes.

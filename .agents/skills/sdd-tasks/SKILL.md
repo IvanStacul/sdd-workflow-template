@@ -93,7 +93,32 @@ Antes de cerrar la fase, revisar:
 - no hay requirements sin al menos una tarea asociada
 - el plan podría retomarse solo leyendo `tasks.md` y `state.md`
 
-Si el plan supera ~20 tareas o necesita demasiadas dependencias cruzadas, recomendar dividir el change.
+**Límite recomendado: ~15-20 tareas por change.** Si el plan supera ese rango, recomendar dividir.
+
+#### Cómo dividir un change grande
+
+Cuando el plan tiene más de ~20 tareas o demasiadas dependencias cruzadas:
+
+1. **Identificar cortes naturales** — buscar grupos de tareas que pueden verificarse y desplegarse de forma independiente. Señales de un buen corte:
+   - las tareas del grupo comparten archivos afectados
+   - el grupo implementa un subconjunto completo de requirements
+   - el grupo no depende de tareas fuera de él para funcionar
+
+2. **Proponer la división al usuario** — presentar los changes sugeridos con nombre, scope y dependencias entre sí:
+   ```
+   Change original: {nombre} (~35 tareas)
+   
+   Propuesta de división:
+   1. {nombre}-foundation (12 tareas) — infraestructura y modelos
+   2. {nombre}-ui (10 tareas) — componentes y páginas
+   3. {nombre}-integration (8 tareas) — conexiones y validaciones
+   
+   Dependencias: 2 y 3 dependen de 1. 2 y 3 son independientes.
+   ```
+
+3. **No dividir artificialmente** — si las 25 tareas están tan acopladas que no hay corte limpio, es mejor mantener un solo change y trabajar por lotes en apply. La división forzada genera más overhead que el change grande.
+
+4. **Cada change dividido necesita su propia proposal y specs** — no alcanza con partir `tasks.md`. El flujo completo aplica a cada sub-change.
 
 ### Step 4: Registrar fase
 

@@ -108,7 +108,7 @@ Marcar `[~]` y documentar el motivo en `tasks.md`.
 
 **Si la spec está mal, es ambigua o incompleta**: no improvisar comportamiento fuera de la spec. Detener la tarea y sugerir qué artefacto necesita actualizarse (spec, design, proposal). El usuario decide si actualizar ahora o diferir.
 
-### Step 5: Registrar avance
+### Step 5: Registrar avance e incidencias
 
 Actualizar:
 
@@ -117,6 +117,24 @@ Actualizar:
 - la tabla de archivos afectados dentro de `state.md`
 
 Registrar cada archivo creado o modificado con el requirement correspondiente. Ese rastro lo usan después `verify` y `archive`.
+
+#### Registro de incidencias de sesión
+
+Si durante la implementación ocurrieron errores de terminal, warnings relevantes, decisiones tomadas por ambigüedad en la spec, o cualquier incidencia que pueda ser útil para verify o archive, registrarlas en `state.md` dentro del log de la fase:
+
+```markdown
+### Incidencias del lote {N}
+- {error de terminal o warning con contexto}
+- {decisión tomada ante ambigüedad: qué se decidió y por qué}
+- {bug encontrado durante implementación}
+```
+
+Este registro es CRÍTICO para continuidad entre sesiones. Si apply corre en la sesión A y verify en la sesión B, las incidencias en `state.md` son la única fuente de datos para:
+- que verify entienda qué problemas ya se encontraron
+- que archive tenga material real para la retro
+- que el usuario no pierda contexto de errores que ocurrieron en sesiones previas
+
+No registrar output completo de comandos — solo el resumen accionable de lo que salió mal o requirió atención.
 
 ### Step 6: Resumen de sesión
 
