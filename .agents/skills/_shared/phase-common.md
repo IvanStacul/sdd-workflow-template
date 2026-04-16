@@ -17,10 +17,11 @@ Antes de cualquier acción, leer en este orden:
 
 1. `openspec/config.yaml` para entender contexto del proyecto, namespaces, modulos y reglas por fase.
 2. `.agents/rules.md` para reglas generales del proyecto.
-3. Si hay change activo, `openspec/changes/{change-name}/state.md`.
-4. Los artefactos previos requeridos por la fase actual según su `SKILL.md` y el flujo definido en `.agents/orchestrator.md`.
-5. `docs/known-issues.md` si existen bug conocidos y lecciones relevantes para la fase.
-6. `docs/workflow-changelog.md` solo si la fase necesita mejorar el workflow o archivar un change.
+3. `.agents/personality.md` para tono, idioma y filosofía de comunicación.
+4. Si hay change activo, `openspec/changes/{change-name}/state.md`.
+5. Los artefactos previos requeridos por la fase actual según su `SKILL.md` y el flujo definido en `.agents/orchestrator.md`.
+6. `docs/known-issues.md` si existen bug conocidos y lecciones relevantes para la fase.
+7. `docs/workflow-changelog.md` solo si la fase necesita mejorar el workflow o archivar un change.
 
 Si un archivo opcional no existe, continuar y reportarlo como observación, no como error fatal.
 

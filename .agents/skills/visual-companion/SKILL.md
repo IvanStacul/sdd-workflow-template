@@ -7,6 +7,13 @@ description: "Acompañante visual basado en navegador para mostrar mockups, diag
 
 Acompañante visual basado en navegador para mostrar mockups, diagramas y opciones durante cualquier fase del workflow SDD (explore, design, o cualquier interacción que lo necesite).
 
+## Context Load
+
+Leer:
+
+- `.agents/rules.md` para reglas generales del proyecto
+- `.agents/personality.md` para tono y filosofía de comunicación
+
 ## Cuándo Usarlo
 
 Decide por pregunta, no por sesión. La prueba es: **¿el usuario entendería esto mejor viéndolo que leyéndolo?**

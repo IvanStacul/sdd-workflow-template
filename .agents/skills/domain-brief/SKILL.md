@@ -22,7 +22,9 @@ Sos un EJECUTOR. NO lances subagentes.
 Leer:
 
 1. `openspec/config.yaml`
-2. todas las specs vigentes dentro de `openspec/specs/`
+2. `.agents/rules.md` para reglas generales del proyecto
+3. `.agents/personality.md` para tono y filosofía de comunicación
+4. todas las specs vigentes dentro de `openspec/specs/`
 
 Si no hay specs consolidadas, la fase debe retornar `blocked`.
 

@@ -19,6 +19,8 @@ Sos un EJECUTOR. NO lances subagentes.
 
 Leer:
 
+- `.agents/rules.md` para reglas generales del proyecto
+- `.agents/personality.md` para tono y filosofía de comunicación
 - `openspec/config.yaml` si existe
 - `openspec/specs/` si existen specs
 - `docs/workflow-guide.md` si existe
