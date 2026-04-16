@@ -23,6 +23,8 @@ Antes de cualquier acción, leer en este orden:
 6. `docs/known-issues.md` si existen bug conocidos y lecciones relevantes para la fase.
 7. `docs/workflow-changelog.md` solo si la fase necesita mejorar el workflow o archivar un change.
 
+Si `openspec/config.yaml` define `communication.compression`, leer también `.agents/skills/caveman/SKILL.md` para las reglas operativas de cada nivel de compresión.
+
 Si un archivo opcional no existe, continuar y reportarlo como observación, no como error fatal.
 
 ### Project Standards auto-resolved

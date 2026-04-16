@@ -22,6 +22,7 @@ Leer:
 - `.agents/rules.md` para reglas generales del proyecto
 - `.agents/personality.md` para tono y filosofía de comunicación
 - `openspec/config.yaml` si existe
+- Si `openspec/config.yaml` define `communication.compression`, leer `.agents/skills/caveman/SKILL.md` para las reglas operativas de cada nivel
 - `openspec/specs/` si existen specs
 - `docs/workflow-guide.md` si existe
 - código del proyecto suficiente para proponer un ejemplo pequeño

@@ -24,7 +24,8 @@ Leer:
 1. `openspec/config.yaml`
 2. `.agents/rules.md` para reglas generales del proyecto
 3. `.agents/personality.md` para tono y filosofía de comunicación
-4. todas las specs vigentes dentro de `openspec/specs/`
+4. Si `openspec/config.yaml` define `communication.compression`, leer `.agents/skills/caveman/SKILL.md` para las reglas operativas de cada nivel
+5. todas las specs vigentes dentro de `openspec/specs/`
 
 Si no hay specs consolidadas, la fase debe retornar `blocked`.
 
