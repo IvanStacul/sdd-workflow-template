@@ -14,6 +14,7 @@ openspec/
         |-- state.md
         |-- exploration.md            <- opcional
         |-- proposal.md
+        |-- impact-map.md             <- opcional; analisis de impacto cruzado cuando el change lo requiera
         |-- specs/
         |   `-- NNN-capability/
         |       `-- spec.md           <- delta spec del change
@@ -146,6 +147,7 @@ Compatibilidad legacy:
 | `sdd-init` | Estructura y config | `openspec/config.yaml`, directorios, docs base |
 | `sdd-explore` | Exploración opcional | `openspec/changes/{name}/exploration.md` |
 | `sdd-propose` | Propuesta | `openspec/changes/{name}/proposal.md` |
+| `sdd-propose` | Analisis cruzado opcional/obligatorio | `openspec/changes/{name}/impact-map.md` |
 | `sdd-spec` | Delta specs del change | `openspec/changes/{name}/specs/{NNN-capability}/spec.md` |
 | `sdd-design` | Diseño técnico | `openspec/changes/{name}/design.md` |
 | `sdd-tasks` | Plan de tareas | `openspec/changes/{name}/tasks.md` |
@@ -160,7 +162,40 @@ Compatibilidad legacy:
 - Crear el directorio del change ANTES de escribir artefactos.
 - Si un archivo ya existe, LEERLO primero y ACTUALIZARLO (NO sobrescribir).
 - Si el directorio del change ya tiene artefactos, el change se está CONTINUANDO.
+- `impact-map.md` aparece solo cuando el change requiere análisis de impacto cruzado; si existe, las fases posteriores deben leerlo y refinarlo en lugar de crear artefactos paralelos.
 - Usar `openspec/config.yaml` sección `rules` para reglas locales por fase cuando existan.
 - Archivar solo después de sincronizar delta specs y de escribir `retro.md`.
 - El archive es inmutable.
 - Los cambios a templates son forward-only: mejoran artefactos nuevos, no reescriben los ya existentes.
+
+## 8. Convención de `impact-map.md`
+
+Cuando exista `impact-map.md`, usar una estructura file-based simple con estas secciones mínimas:
+
+- clasificación del análisis y dominio principal
+- dominios secundarios
+- referencias tipadas
+- contratos o interfaces afectadas
+- downstream flows
+- edge cases cross-domain
+- exclusiones explícitas
+- evidencia esperada para verify
+
+Cada referencia del mapa debe registrar como mínimo:
+
+| Campo | Uso |
+|-------|-----|
+| `target` | path local o identificador textual (`repo:path`, `repo@ref:path`, `path`) |
+| `target_type` | `domain` · `capability` · `spec` · `artifact` · `contract` · `flow` · `external-reference` |
+| `relation` | `depends-on` · `updates` · `consumes` · `emits` · `constrains` · `verified-by` · `excluded-after-review` |
+| `status` | `primary` · `secondary` · `in-scope` · `out-of-scope` · `watch-only` |
+| `reason` | contexto breve y verificable |
+| `tags` | labels planas para filtrar o agrupar |
+
+Reglas operativas:
+
+- Deduplicar referencias por combinación de `target` + `relation`.
+- Si cambia el alcance de un target ya registrado, actualizar `status`, `reason` y `tags` en la misma entrada en lugar de duplicarla.
+- Registrar seguimientos relacionados con nuevas filas o bullets breves que apunten al `target` correspondiente; no anidar recursivamente el contenido completo de otro artefacto.
+- Los tags deben ser planos y acotados; usar listas simples como `cross-phase`, `shared-contract`, `verify-critical`, evitando sub-taxonomías infinitas.
+- Las exclusiones deben conservar motivo y fecha de revisión para que `verify` pueda distinguir descarte consciente de omisión.

@@ -18,6 +18,7 @@ Sos un EJECUTOR - escribí el plan directamente. No lances subagentes.
 - Nombre del change.
 - specs del change.
 - design del change, si existe.
+- `impact-map.md` si existe.
 
 ## Context Load
 
@@ -29,6 +30,7 @@ Leer OBLIGATORIAMENTE:
 
 - `openspec/changes/{change-name}/specs/`
 - `openspec/changes/{change-name}/design.md` si existe
+- `openspec/changes/{change-name}/impact-map.md` si existe
 - `_shared/abstraction-guide.md`
 
 Si `openspec/config.yaml` define `rules.tasks`, tratarlas como reglas locales de esta fase. Pueden agregar formato, criterios de granularidad o checks adicionales; complementan esta skill, no la reemplazan.
@@ -47,6 +49,8 @@ Usar grupos como:
 - implementación
 - integracion
 - verificación o limpieza, si aplica
+
+Si existe `impact-map.md`, usarlo para agrupar trabajo cross-domain por contratos, flows o boundaries compartidos, en lugar de esconder esos cruces dentro de tareas genéricas.
 
 Si el change es chico, no fuerces cuatro fases. Pocas fases claras son mejores que una taxonomia artificial.
 
@@ -81,6 +85,8 @@ Puntos clave:
 - `**Depende de**` define el orden entre lotes
 - `**Criterio**` define cuando puede marcarse `[x]`
 
+Si existe `impact-map.md`, cada dominio secundario, contrato compartido o downstream flow `in-scope` debe quedar cubierto por al menos una tarea verificable o una exclusión explícita. No dejar impactos críticos solo en el mapa.
+
 Cuando una tarea cruza una frontera entre capas o subsistemas (por ejemplo frontend/backend, request/response, import/export, UI/runtime), el `**Criterio**` debe dejar explicito el contrato esperado con un ejemplo minimo observable: payload, shape, parametros, orden o resultado visible. No alcanza con "integrar".
 
 Si no existe `design.md`, las tareas igual deben quedar claras a partir de specs. No inventes una pseudo-sección de design dentro de `tasks.md`: si faltan decisiones estructurales reales, eso es una observación para volver a `sdd-design`, no algo para esconder en el plan.
@@ -94,6 +100,7 @@ Antes de cerrar la fase, revisar:
 - las dependencias son explícitas
 - no hay requirements sin al menos una tarea asociada
 - el plan podría retomarse solo leyendo `tasks.md` y `state.md`
+- si existe `impact-map.md`, cada contrato o downstream flow `in-scope` quedo convertido en tarea, criterio observable o exclusión justificada
 
 **Límite recomendado: ~15-20 tareas por change.** Si el plan supera ese rango, recomendar dividir.
 
@@ -169,6 +176,7 @@ skill_resolution: disabled | direct | injected | fallback
 - Si existe `design.md`, usarlo para resolver orden y dependencias, no para duplicar texto.
 - Si continuas un `tasks.md` existente, leerlo antes de actualizarlo.
 - Si el plan ya excede el tamano razonable y el corte es claro, detener la fase y materializar la division antes de seguir.
+- Si existe `impact-map.md`, no dejar contratos o cruces `in-scope` sin una tarea observable o una exclusión explícita.
 
 ## Optional Modules
 

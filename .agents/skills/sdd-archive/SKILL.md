@@ -27,10 +27,12 @@ En la práctica, eso implica leer config, reglas generales, `state.md` del chang
 
 Leer OBLIGATORIAMENTE:
 
+- `openspec/changes/{change-name}/proposal.md`
 - `openspec/changes/{change-name}/verify-report.md`
 - `openspec/changes/{change-name}/tasks.md`
 - `openspec/changes/{change-name}/specs/` - todos los delta specs del change
 - `openspec/changes/{change-name}/state.md`
+- `openspec/changes/{change-name}/impact-map.md` si existe
 - `docs/known-issues.md` si existe
 - `docs/workflow-changelog.md` si existe
 
@@ -77,6 +79,7 @@ La retro debe incluir como mínimo:
 - lecciones aprendidas
 - mejoras propuestas al workflow
 - decisiones a preservar desde `state.md`
+- hallazgos cross-domain relevantes del `impact-map.md`, si existe
 
 ### Step 3: Propagar bugs, lecciones y mejoras
 
@@ -87,6 +90,7 @@ Propagación esperada:
 - cada bug relevante de la retro debe quedar registrado en `docs/known-issues.md`
 - las lecciones deben registrarse con un tipo útil (`Arquitectura`, `Flujo`, `Negocio`, `Tooling` o similar)
 - las mejoras al workflow deben quedar en `docs/workflow-changelog.md`
+- si el `impact-map.md` revela un patrón reusable de cobertura, omisión justificada o anti-patrón cross-domain, convertirlo en lección o mejora persistente
 
 Si una mejora al flujo es concreta, de bajo riesgo y claramente correcta:
 
@@ -98,6 +102,12 @@ Si la mejora es compleja, riesgosa o requiere criterio humano:
 
 - dejarla como `propuesta`
 - no forzar el cambio durante archive
+
+Regla para hallazgos de impacto cruzado:
+
+- registrar en `docs/known-issues.md` cuando el hallazgo describe un riesgo recurrente, anti-patrón o lección reusable para futuros changes
+- registrar en `docs/workflow-changelog.md` cuando el hallazgo ya quedó absorbido como comportamiento permanente del workflow
+- no propagar ruido local: si el hallazgo solo explica este change y no aporta una regla reusable, dejarlo en `retro.md`
 
 Si `docs/known-issues.md` o `docs/workflow-changelog.md` no existen, no bloquear el archive solo por eso. Reportarlo como observación y continuar.
 
@@ -227,6 +237,7 @@ skill_resolution: disabled | direct | injected | fallback
 - Templates forward-only: cambios a templates NO migran artefactos existentes.
 - Antes del merge final, reconciliar decisiones de `state.md` con el texto de los delta specs.
 - El archive es INMUTABLE: no modificar changes archivados.
+- Si existe `impact-map.md`, preservarlo dentro del change archivado como parte del audit trail y usarlo para decidir qué hallazgos se propagan a docs.
 
 ## Optional Modules
 

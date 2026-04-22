@@ -16,6 +16,7 @@ Sos un EJECUTOR - verifica directamente. No lances subagentes.
 ## Inputs
 
 - Nombre del change.
+- `impact-map.md` si existe.
 
 ## Context Load
 
@@ -25,10 +26,12 @@ En la práctica, eso implica leer config, reglas generales, `state.md` del chang
 
 Leer OBLIGATORIAMENTE:
 
+- `openspec/changes/{change-name}/proposal.md`
 - `openspec/changes/{change-name}/specs/`
 - `openspec/changes/{change-name}/tasks.md`
 - `openspec/changes/{change-name}/state.md`
 - `openspec/changes/{change-name}/design.md` si existe
+- `openspec/changes/{change-name}/impact-map.md` si existe
 - `docs/known-issues.md` si existe
 - `_shared/abstraction-guide.md`
 
@@ -107,6 +110,16 @@ Para cada requirement y scenario:
 
 No saltees scenarios ni edge cases documentados. El objetivo de verify es cubrir el change completo, no solo una muestra.
 
+Si existe `impact-map.md`, además construir una matriz complementaria `impact-map -> coverage` para revisar:
+
+- dominios secundarios `in-scope`
+- contratos o interfaces afectados
+- downstream flows listados
+- edge cases cross-domain
+- exclusiones explícitas y su razón
+
+Si el mapa contradice `proposal.md`, specs, `design.md` o `tasks.md`, registrar issue. Si un target `in-scope` no tiene cobertura o justificación suficiente, no declararlo cumplido.
+
 ### Step 4: Ejecutar evidencia runtime
 
 Si existe `testing.test_command`, ejecutarlo.
@@ -130,6 +143,7 @@ Incluir:
 - estado de tasks (`[x]`, `[ ]`, `[~]`)
 - build/tests/typecheck/coverage si existen
 - matriz `scenario -> evidence`
+- cobertura del `impact-map.md` si existe
 - issues separados en `CRITICAL`, `WARNING`, `SUGGESTION`
 - veredicto
 
@@ -148,6 +162,10 @@ Usar una estructura de este estilo:
 - Test command: {comando o "no configurado"}
 - Typecheck: {resultado o "no configurado"}
 - Coverage: {resultado o "no configurado"}
+
+## Cobertura de Impact Map
+| Tipo | Target | Estado en mapa | Cobertura encontrada | Resultado |
+|------|--------|----------------|----------------------|-----------|
 
 ## Matriz Scenario -> Evidence
 
@@ -175,6 +193,12 @@ Guia de severidad:
 - `CRITICAL`: el comportamiento requerido no se cumple o no hay evidencia suficiente para declararlo cumplido en un punto que bloquea cierre.
 - `WARNING`: hay riesgo, deuda o falta de cobertura importante, pero no necesariamente bloquea.
 - `SUGGESTION`: mejora opcional.
+
+Si existe `impact-map.md`, tratar también como `CRITICAL`:
+
+- contradicción material entre mapa y proposal/spec/design/tasks
+- contrato o downstream flow `in-scope` sin cobertura ni exclusión justificada
+- exclusión sin razón verificable o edge case cross-domain omitido sin explicación
 
 ### Step 7: Registrar fase
 
@@ -209,6 +233,7 @@ skill_resolution: disabled | direct | injected | fallback
 - Si hay tareas pendientes o bloqueadas, dejarlo explicitado en el reporte y en el veredicto.
 - Verificar scenarios y edge cases del change, no solo tests existentes.
 - No arregles issues en verify; solo reportalos.
+- Si existe `impact-map.md`, verificarlo contra proposal, spec, design y tasks; no alcanza con revisar solo scenarios.
 
 ## Optional Modules
 

@@ -17,6 +17,7 @@ Sos un EJECUTOR - escribí las specs directamente. NO lances subagentes.
 
 - Nombre del change.
 - `openspec/changes/{change-name}/proposal.md`.
+- `openspec/changes/{change-name}/impact-map.md` si existe.
 
 ## Context Load
 
@@ -27,6 +28,7 @@ En la práctica, eso implica leer config, reglas generales, `state.md` del chang
 Leer OBLIGATORIAMENTE:
 
 - `openspec/changes/{change-name}/proposal.md` - la sección `Capabilities` es tu contrato.
+- `openspec/changes/{change-name}/impact-map.md` si existe - usarlo como fuente de verdad del análisis cruzado.
 - `openspec/specs/` para resolver numeración y leer comportamiento vigente cuando haya capabilities modificadas.
 - `openspec/changes/{change-name}/specs/` si ya existen delta specs y estás continuando trabajo previo.
 - `assets/spec.template.md` como base para specs nuevas.
@@ -43,6 +45,14 @@ Leer `proposal.md` y separar:
 
 - **Capabilities nuevas** -> cada una genera una spec completa nueva.
 - **Capabilities modificadas** -> cada una genera una delta spec que referencia una spec consolidada existente.
+
+Si existe `impact-map.md`, contrastar desde el inicio:
+
+- dominio principal y dominios secundarios en scope
+- referencias a capabilities, specs o artefactos relacionadas
+- contratos o interfaces afectadas
+- downstream flows observables
+- edge cases cross-domain y exclusiones explícitas
 
 Si `proposal.md` no deja suficientemente clara esta separación, corregir la ambigüedad en la propuesta o devolver riesgo explícito. No inventes mappings silenciosos.
 
@@ -68,6 +78,13 @@ Cuando la propuesta fue dividida para preservar continuidad entre sesiones, pref
 Para cada capability modificada, leer la spec consolidada actual en `openspec/specs/{NNN-capability}/spec.md`.
 
 El objetivo de este paso es entender el comportamiento vigente para poder escribir una delta real. Sin esa lectura, `MODIFIED` y `REMOVED` quedan ambiguos y `sdd-archive` no puede sincronizar bien.
+
+Si existe `impact-map.md`, en este paso también extraer una lista breve de cobertura esperada:
+
+- dominios o capabilities `primary`, `secondary` o `in-scope`
+- contratos marcados como afectados
+- downstream flows con `in-scope` o `watch-only`
+- edge cases que la spec debe cubrir o excluir con razón
 
 ### Step 4: Escribir las specs del change
 
@@ -136,6 +153,15 @@ Cuando una requirement existente cambia, seguir este flujo exacto:
 
 Esto es obligatorio porque `sdd-archive` necesita un bloque completo para reemplazar el requirement consolidado sin perder scenarios previos.
 
+#### 4.4 Cobertura guiada por `impact-map.md`
+
+Si existe `impact-map.md`, las specs del change deben:
+
+- cubrir o justificar cada dominio o capability `in-scope` del mapa
+- reflejar contratos o interfaces afectados en requirements o scenarios verificables
+- convertir los edge cases cross-domain del mapa en `Edge Cases` de la spec o dejar la exclusión explícita correspondiente
+- evitar reescribir el mapa completo dentro de la spec; resumir solo lo necesario para el comportamiento
+
 ### Step 5: Validar cobertura mínima
 
 Antes de cerrar la fase, revisar:
@@ -146,6 +172,8 @@ Antes de cerrar la fase, revisar:
 - la spec describe comportamiento, no implementación
 - las delta specs distinguen claramente `ADDED`, `MODIFIED` y `REMOVED`
 - si la propuesta venia dividida, el corte ya quedo materializado en specs separadas y no solo mencionado en texto
+- si existe `impact-map.md`, cada dominio secundario, contrato o downstream flow `in-scope` quedo cubierto o justificado explícitamente
+- si existe `impact-map.md`, las exclusiones y edge cases del mapa no contradicen la spec escrita
 
 ### Step 6: Registrar fase
 
@@ -185,6 +213,7 @@ skill_resolution: disabled | direct | injected | fallback
 - Si agregas comportamiento nuevo sin cambiar lo existente, usar `ADDED`, no `MODIFIED`.
 - Si continuas una spec ya empezada, leerla antes de actualizarla.
 - Si la propuesta ya venia partida en slices, escribir esa separacion en archivos de spec distintos desde esta fase.
+- Si existe `impact-map.md`, usarlo para cerrar cobertura de dominios, contratos, flows y edge cases sin duplicar su contenido completo dentro de la spec.
 
 ## Optional Modules
 

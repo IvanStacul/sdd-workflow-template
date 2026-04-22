@@ -13,7 +13,7 @@ Los comandos públicos viven en `.agents/commands/sdd/`:
 | `/sdd:init` | Instalar o re-detectar el workflow en un proyecto | Escribe `openspec/config.yaml` y asegura la estructura base |
 | `/sdd:onboard` | Aprender el flujo con un ejemplo real del repo | Explica el workflow paso a paso |
 | `/sdd:new <nombre>` | Abrir un change completo | Recorre `propose -> spec -> design` como gate técnico -> `tasks` |
-| `/sdd:continue [nombre]` | Retomar un change ya empezado | Lee artefactos + `state.md` y elige la siguiente fase compatible |
+| `/sdd:continue [nombre]` | Retomar un change ya empezado | Lee artefactos + `state.md` y elige la siguiente fase compatible, reusando `impact-map.md` si existe |
 | `/sdd:ff [nombre]` | Avanzar sin pausas por las fases pendientes | Fuerza `interaction_mode: auto` y sigue hasta bloquear o terminar |
 | `/sdd:explore <tema>` | Investigar antes de proponer | Produce contexto para decidir mejor un change |
 | `/sdd:propose <nombre>` | Crear una propuesta formal puntual | Genera el arranque de un change sin correr todo el flujo |
@@ -34,6 +34,7 @@ explore (opcional) -> propose -> spec -> design (opcional) -> tasks -> apply -> 
 Hay una diferencia importante entre interfaz pública y fases internas:
 
 - `/sdd:new <nombre>` es la puerta de entrada normal al flujo completo.
+- Si `sdd-propose` clasifica el análisis cruzado como `obligatorio` o `recomendado`, crea o actualiza `impact-map.md` y las fases siguientes continúan ese mismo archivo.
 - `propose`, `spec`, `design` y `tasks` siguen siendo fases internas del workflow.
 - En este template no se presentan `spec`, `design` ni `tasks` como comandos públicos separados.
 - `/sdd:continue` y `/sdd:ff` no adivinan la siguiente fase por nombre: la resuelven mirando artefactos reales y `state.md`.
@@ -79,6 +80,7 @@ Este repo es el template. No todos los artefactos de un proyecto ya inicializado
 | Ruta | Quien lo genera | Nota |
 |------|------------------|------|
 | `openspec/changes/{change-name}/proposal.md` | `sdd-propose` | Arranque del change |
+| `openspec/changes/{change-name}/impact-map.md` | `sdd-propose` cuando aplica | Fuente de verdad del análisis cruzado; se reutiliza en las fases siguientes |
 | `openspec/changes/{change-name}/specs/.../spec.md` | `sdd-spec` | Delta specs del change |
 | `openspec/changes/{change-name}/design.md` | `sdd-design` cuando aplica | Puede no existir si el gate técnico concluye que no hace falta |
 | `openspec/changes/{change-name}/tasks.md` | `sdd-tasks` | Plan ejecutable del change |
@@ -113,6 +115,15 @@ Puntos a recordar:
 - `domain` se usa como agrupacion conceptual o explicación funcional, por ejemplo en `domain-brief`.
 - Toda la persistencia durable vive en Markdown dentro del repo.
 - Los cambios a templates son forward-only: mejoran artefactos nuevos, no reescriben historico.
+
+### Analisis cross-domain con `impact-map.md`
+
+- La clasificación puede ser `obligatorio`, `recomendado` u `opcional`.
+- Es `obligatorio` cuando el change cruza dominios, contratos compartidos, templates del workflow o riesgo funcional alto.
+- Es `recomendado` cuando el cambio parece local pero tiene downstream flows o dependencias que conviene revisar.
+- Es `opcional` solo para fixes acotados sin contratos ni efectos aguas abajo; la omisión debe quedar justificada.
+- Si el mapa existe, `spec`, `design`, `tasks`, `verify` y `archive` lo releen y refinan; no se crean copias paralelas.
+- Los examples estáticos viven en `docs/examples/impact-map-required.md` y `docs/examples/impact-map-optional.md`.
 
 ## 6. Como leer el repo
 

@@ -2,11 +2,13 @@
 
 > **Specs**: [specs/](./specs/)
 > **Design**: [design.md](./design.md) _(si existe; si no, borrar esta línea)_
+> **Impact Map**: [impact-map.md](./impact-map.md) _(si existe; usarlo para cubrir cruces in-scope)_
 
 ## Convenciones
 
 - **Estados**: `[ ]` pendiente · `[~]` en progreso · `[x]` completada
 - **Refs**: cada tarea referencia el requirement que implementa
+- **Cobertura cruzada**: cada contrato o flow `in-scope` del mapa debe quedar cubierto por una tarea o exclusión explícita
 
 ---
 

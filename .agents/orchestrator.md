@@ -96,6 +96,7 @@ propose -> spec -> design (decisión gate) -> tasks -> apply -> verify -> archiv
 Ideas clave del grafo:
 
 - `sdd-design` funciona como gate después de `sdd-spec`: la skill decide si hace falta `design.md` o si `sdd-tasks` puede seguir sin ese artefacto.
+- `impact-map.md` puede aparecer desde `sdd-propose` cuando el change requiere análisis cruzado; si existe, `sdd-spec`, `sdd-design`, `sdd-tasks`, `sdd-verify` y `sdd-archive` lo leen como fuente de verdad de impactos relacionados.
 - `sdd-verify` puede devolver el change a `sdd-apply` si encuentra issues o tareas incompletas.
 - `sdd-archive` solo corre cuando verify deja al change realmente listo para cerrar.
 
@@ -105,11 +106,11 @@ Dependencias minimas por fase:
 |------|----------|
 | `sdd-explore` | init si se usara `openspec/` |
 | `sdd-propose` | init |
-| `sdd-spec` | `proposal.md` |
-| `sdd-design` | `proposal.md` + specs del change |
-| `sdd-tasks` | specs del change + `design.md` si existe |
-| `sdd-apply` | `tasks.md` + specs del change + `design.md` si existe |
-| `sdd-verify` | `tasks.md` + specs del change + `state.md` |
+| `sdd-spec` | `proposal.md` + `impact-map.md` si existe |
+| `sdd-design` | `proposal.md` + specs del change + `impact-map.md` si existe |
+| `sdd-tasks` | specs del change + `design.md` si existe + `impact-map.md` si existe |
+| `sdd-apply` | `tasks.md` + specs del change + `design.md` si existe + `impact-map.md` si existe |
+| `sdd-verify` | `tasks.md` + specs del change + `state.md` + `impact-map.md` si existe |
 | `sdd-archive` | `verify-report.md` sin `CRITICAL` y con veredicto compatible con archive |
 
 ## Resolver la siguiente fase
@@ -119,7 +120,7 @@ Cuando el orquestador necesita decidir que viene después, usar este orden:
 1. Si el usuario pidio una utilidad pública explícita (`/sdd:onboard`, `/sdd:patch`, `/sdd:domain-brief`), ejecutar esa skill y no intentar forzar el flujo largo.
 2. Si el usuario pidio una fase puntual válida (`/sdd:explore`, `/sdd:propose`, `/sdd:apply`, `/sdd:verify`, `/sdd:archive`), respetar ese pedido, pero solo si las dependencias mínimas están listas.
 3. Si el usuario pidio `/sdd:new <nombre>`, recorrer `sdd-propose -> sdd-spec -> sdd-design -> sdd-tasks`.
-4. Si el usuario pidio `/sdd:continue [nombre]` o `/sdd:ff [nombre]`, leer artefactos y `state.md` para elegir la siguiente fase compatible real.
+4. Si el usuario pidio `/sdd:continue [nombre]` o `/sdd:ff [nombre]`, leer artefactos, `state.md` e `impact-map.md` si existe para elegir la siguiente fase compatible real.
 
 Heurística para `continue` y `ff`:
 
@@ -135,6 +136,7 @@ Heurística para `continue` y `ff`:
 | `verify-report.md` deja al change listo para cierre | `sdd-archive` |
 
 No uses solo el nombre de la fase para decidir. Contrasta `state.md` con los artefactos realmente presentes.
+Si existe `impact-map.md`, tratarlo como artefacto continuo del change: releerlo, preservarlo y seguir refinando el mismo archivo en lugar de crear variantes paralelas.
 
 ## Heurísticas de coordinación
 
@@ -163,6 +165,7 @@ Cuando lances una fase:
 7. Espera el envelope de retorno y decide el siguiente paso.
 
 El subagente o la ejecución inline deben seguir después `_shared/phase-common.md` y el `SKILL.md` específico de la fase.
+Si existe `impact-map.md`, incluirlo siempre entre los artefactos previos de las fases que lo consumen.
 
 ## Model routing (módulo opcional)
 
@@ -196,8 +199,8 @@ Reglas:
 
 | Comando | Qué hace el orquestador |
 |---------|-------------------------|
-| `/sdd:new <nombre>` | Ejecuta `sdd-propose`, `sdd-spec`, pasa por `sdd-design` como gate técnico y luego `sdd-tasks` |
-| `/sdd:continue [nombre]` | Reanuda el change según artefactos + `state.md` |
+| `/sdd:new <nombre>` | Ejecuta `sdd-propose`, `sdd-spec`, pasa por `sdd-design` como gate técnico y luego `sdd-tasks`; si `sdd-propose` crea `impact-map.md`, las fases siguientes continúan ese mismo artefacto |
+| `/sdd:continue [nombre]` | Reanuda el change según artefactos + `state.md`; si existe `impact-map.md`, lo relee antes de decidir y sigue usando el mismo archivo |
 | `/sdd:ff [nombre]` | Fuerza `interaction_mode: auto` y corre todas las fases pendientes compatibles |
 | `/sdd:onboard` | Guía el flujo con un ejemplo real del repo |
 | `/sdd:patch` | Ejecuta `sdd-patch` directamente, fuera del flujo largo |
@@ -210,7 +213,7 @@ Si la sesión se interrumpe:
 
 1. Listar `openspec/changes/` excluyendo `archive/`.
 2. Leer `state.md` de cada change activo.
-3. Revisar que artefactos reales existen en cada change.
+3. Revisar que artefactos reales existen en cada change, incluyendo `impact-map.md` cuando aplique.
 4. Resolver la siguiente fase compatible usando el grafo y la tabla de arriba.
 5. Proponer continuar desde ahí o ejecutar `/sdd:continue`.
 

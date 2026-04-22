@@ -30,6 +30,7 @@ En la práctica, eso implica leer config, reglas generales, `state.md` si el cha
 Además leer:
 
 - `openspec/changes/{change-name}/exploration.md` si existe.
+- `openspec/changes/{change-name}/impact-map.md` si existe.
 - `openspec/specs/` para detectar capabilities existentes y no inventar modificaciones.
 - `docs/domain-brief.md` si existe y ayuda a entender el dominio.
 
@@ -112,7 +113,36 @@ Puntos clave de esta estructura:
 - `### Fuera` evita scope creep y debe quedar tan claro como `### Dentro`.
 - `## Plan de Rollback` es obligatorio aunque el rollback sea "revert del commit".
 
-### Step 4: Validar que la propuesta sea accionable
+### Step 4: Clasificar el análisis cruzado y crear o actualizar `impact-map.md`
+
+Evaluar si el change requiere análisis de impacto cruzado con esta matriz mínima:
+
+- `obligatorio` si el change toca 2 o más dominios o capabilities relacionadas, modifica un contrato compartido, cambia templates del workflow o integra fases distintas.
+- `obligatorio` si el riesgo funcional es alto o el cambio es claramente cross-cutting aunque la implementación viva en pocos archivos.
+- `recomendado` si el cambio parece local pero tiene downstream flows, navegación entre artefactos o dependencias que conviene revisar explícitamente.
+- `opcional` solo para cambios acotados y localizados, como fixes editoriales o ajustes sin contratos ni efectos aguas abajo.
+
+Reglas de persistencia:
+
+- Si la clasificación es `obligatorio` o `recomendado`, crear o actualizar `openspec/changes/{change-name}/impact-map.md` usando `assets/impact-map.template.md`.
+- Si el archivo ya existe, leerlo y refinar el mismo artefacto; no reemplazarlo ni crear paralelos.
+- Si la clasificación es `opcional`, dejar una justificación breve dentro de la propuesta y conservar esa clasificación visible para que fases posteriores puedan verificar la omisión.
+
+Contenido mínimo cuando exista `impact-map.md`:
+
+- nivel de clasificación y justificación
+- dominio principal afectado
+- dominios secundarios revisados
+- referencias tipadas iniciales
+- contratos o interfaces afectadas
+- downstream flows observables
+- edge cases cross-domain detectados
+- exclusiones explícitas con razón
+- evidencia esperada para verify
+
+Usar referencias tipadas deduplicadas por `target` + `relation`, sin nesting recursivo.
+
+### Step 5: Validar que la propuesta sea accionable
 
 Antes de cerrar la fase, revisar:
 
@@ -134,18 +164,19 @@ Si la division ya esta clara y el usuario quiere seguir en la misma sesion, rede
 
 **Criterio de decisión vs pregunta**: si algo es razonablemente inferible del contexto (exploración previa, specs existentes, conversación), tomar la decisión y documentarla en la propuesta. Si falta información que cambia el alcance o las capabilities, preguntar. Preferir mantener el momentum con decisiones razonables antes que frenar con preguntas menores.
 
-### Step 5: Presentar para review
+### Step 6: Presentar para review
 
 Antes de registrar la fase, presentar al usuario un resumen breve de la propuesta:
 
 - Nombre del change
 - Capabilities nuevas y modificadas
+- Clasificación del análisis cruzado (`obligatorio`, `recomendado` u `opcional`)
 - Qué queda dentro y fuera del alcance
 - Riesgos principales
 
 Esperar confirmación o ajustes. No asumir aceptación implícita.
 
-### Step 6: Registrar fase
+### Step 7: Registrar fase
 
 Actualizar `state.md` siguiendo `_shared/phase-common.md`.
 
@@ -155,6 +186,7 @@ Escribir o actualizar:
 
 - `openspec/changes/{change-name}/state.md`
 - `openspec/changes/{change-name}/proposal.md`
+- `openspec/changes/{change-name}/impact-map.md` cuando la clasificación sea `obligatorio` o `recomendado`
 
 ## Return Envelope
 
@@ -178,6 +210,7 @@ skill_resolution: disabled | direct | injected | fallback
 - Tratar el change como continuación si ya existe directorio o artefactos previos.
 - Si el scope es demasiado grande, dejar la division operativa en la propuesta. No alcanza con "conviene dividir".
 - No dejar `Capabilities` ambiguas: `sdd-spec` depende de esa sección.
+- Si el análisis cruzado queda como `opcional`, dejar la justificación explícita; si queda como `obligatorio` o `recomendado`, no cerrar la fase sin `impact-map.md`.
 
 ## Optional Modules
 

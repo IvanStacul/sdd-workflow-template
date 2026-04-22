@@ -109,6 +109,21 @@ Con esto, una skill nueva que siga `phase-common` arranca con la misma memoria o
 
 ---
 
+## Trazabilidad cross-domain con `impact-map.md` (2026-04-22)
+
+**Estado**: aplicada
+**Origen**: spec-2026-04-22-03-workflow-cross-domain-traceability
+**Skills/archivos afectados**: `.agents/orchestrator.md`, `.agents/skills/_shared/openspec-convention.md`, `.agents/skills/_shared/phase-common.md`, `.agents/skills/sdd-propose/`, `.agents/skills/sdd-spec/`, `.agents/skills/sdd-design/`, `.agents/skills/sdd-tasks/`, `.agents/skills/sdd-verify/`, `.agents/skills/sdd-archive/`, `README.md`, `docs/workflow-guide.md`
+
+Se agregó un artefacto file-based `impact-map.md` para changes con análisis cruzado obligatorio o recomendado.
+
+- **Fuente de verdad única** — `impact-map.md` concentra dominios, contratos, flows, edge cases, exclusiones y evidencia esperada, evitando repartir esa información entre proposal/spec/design/tasks.
+- **Referencias tipadas y deduplicadas** — el mapa usa `target`, `target_type`, `relation`, `status`, `reason` y `tags`, con deduplicación por `target` + `relation` y sin nesting recursivo.
+- **Integración entre fases** — `sdd-propose` lo clasifica y crea, `sdd-spec`/`sdd-design`/`sdd-tasks` lo consumen, `sdd-verify` valida cobertura cruzada y `sdd-archive` decide qué hallazgos se propagan a docs.
+- **Adopción forward-only** — aplica automáticamente a changes nuevos; los anteriores solo lo incorporan si alguien los migra manualmente.
+
+---
+
 <!-- Formato para entradas futuras:
 
 ## {Descripción} ({YYYY-MM-DD})
