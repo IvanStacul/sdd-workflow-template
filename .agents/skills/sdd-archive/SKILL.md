@@ -152,6 +152,26 @@ Mover `openspec/changes/{change-name}/` a `openspec/changes/archive/{change-name
 
 No agregar fecha extra: el nombre del change ya incluye su prefijo con fecha.
 
+En Windows/PowerShell, `Move-Item` puede copiar sin eliminar el original cuando `archive/` ya existe. Usar siempre este patrón seguro:
+
+```powershell
+Move-Item -Path "openspec\changes\{change-name}" -Destination "openspec\changes\archive\" -Force
+```
+
+**OBLIGATORIO después de mover**: verificar que el original no quedó activo:
+
+```powershell
+Get-ChildItem "openspec\changes" -Directory | Select-Object Name
+```
+
+Si el change sigue apareciendo fuera de `archive/`, eliminarlo inmediatamente:
+
+```powershell
+Remove-Item -Path "openspec\changes\{change-name}" -Recurse -Force
+```
+
+El archive no está completo hasta que esta verificación pase. No mostrar el resumen de cierre hasta confirmar.
+
 ### Step 7: Resumen de cierre
 
 Mostrar un resumen estructurado del archive:
