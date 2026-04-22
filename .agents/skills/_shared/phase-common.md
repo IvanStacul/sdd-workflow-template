@@ -27,6 +27,16 @@ Si `openspec/config.yaml` define `communication.compression`, leer también `.ag
 
 Si un archivo opcional no existe, continuar y reportarlo como observación, no como error fatal.
 
+## B.1 Checklist de guardrails operativos compartidos
+
+Antes de avanzar o dar una fase por cerrada, revisar esta checklist cuando el caso aplique:
+
+- [ ] Si el change ya quedo grande y el corte es claro, la division quedo materializada en el artefacto correcto o se reruto a la fase que la deja en disco antes de seguir.
+- [ ] Si el slice cruza capas, subsistemas o comportamiento riesgoso, quedo al menos un contrato observable minimo y una validacion minima asociada.
+- [ ] `state.md` no se adelanta: primero evidencia local del cambio o del artefacto generado, despues trazabilidad.
+- [ ] Si aparecio drift entre spec, codigo y decisiones registradas, quedo corregido en el mismo batch o bloqueado explicitamente.
+- [ ] Si la fase va a consolidar o sincronizar specs, el texto final fue reconciliado con decisiones registradas y comportamiento validado.
+
 ### Project Standards auto-resolved
 
 Si el orquestador inyecto un bloque `## Project Standards (auto-resolved)`, seguir esas reglas tal como llegaron. Ese bloque ya representa skills de proyecto resueltas y compactadas; no releer los `SKILL.md` originales salvo que la fase entre en modo `fallback`.

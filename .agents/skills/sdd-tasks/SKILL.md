@@ -81,6 +81,8 @@ Puntos clave:
 - `**Depende de**` define el orden entre lotes
 - `**Criterio**` define cuando puede marcarse `[x]`
 
+Cuando una tarea cruza una frontera entre capas o subsistemas (por ejemplo frontend/backend, request/response, import/export, UI/runtime), el `**Criterio**` debe dejar explicito el contrato esperado con un ejemplo minimo observable: payload, shape, parametros, orden o resultado visible. No alcanza con "integrar".
+
 Si no existe `design.md`, las tareas igual deben quedar claras a partir de specs. No inventes una pseudo-sección de design dentro de `tasks.md`: si faltan decisiones estructurales reales, eso es una observación para volver a `sdd-design`, no algo para esconder en el plan.
 
 ### Step 3: Validar tamaño
@@ -94,6 +96,8 @@ Antes de cerrar la fase, revisar:
 - el plan podría retomarse solo leyendo `tasks.md` y `state.md`
 
 **Límite recomendado: ~15-20 tareas por change.** Si el plan supera ese rango, recomendar dividir.
+
+Si el plan supera ese rango y la división es razonable, no cierres la fase con un `tasks.md` gigante. Devolve `partial` y reruta a materializar el corte en propuesta/specs antes de seguir con implementación.
 
 #### Cómo dividir un change grande
 
@@ -116,9 +120,19 @@ Cuando el plan tiene más de ~20 tareas o demasiadas dependencias cruzadas:
    Dependencias: 2 y 3 dependen de 1. 2 y 3 son independientes.
    ```
 
-3. **No dividir artificialmente** — si las 25 tareas están tan acopladas que no hay corte limpio, es mejor mantener un solo change y trabajar por lotes en apply. La división forzada genera más overhead que el change grande.
+3. **Materializar el corte, no solo anunciarlo** — si el usuario acepta dividir o el corte ya venia claro desde `proposal.md`, el siguiente paso no es dejar una nota en `tasks.md`. Hay que volver a `sdd-propose`/`sdd-spec` y dejar creados los slices y sus specs acotadas para que otra sesion pueda retomarlos sin depender del contexto conversacional.
 
 4. **Cada change dividido necesita su propia proposal y specs** — no alcanza con partir `tasks.md`. El flujo completo aplica a cada sub-change.
+
+5. **No dividir artificialmente** — si las 25 tareas están tan acopladas que no hay corte limpio, es mejor mantener un solo change y trabajar por lotes en apply. La división forzada genera más overhead que el change grande.
+
+#### Criterios minimos para slices riesgosos
+
+Cuando el plan incluya alguno de estos casos, las tareas deben dejar evidencia minima desde el criterio:
+
+- controller, handler o flujo backend nuevo -> al menos una tarea de test o validacion del flujo completo
+- feature interactiva de input, teclado o foco -> al menos un test unitario, smoke runtime o validacion equivalente
+- contrato entre capas -> ejemplo minimo de request, response, payload o forma de intercambio
 
 ### Step 4: Registrar fase
 
@@ -154,6 +168,7 @@ skill_resolution: disabled | direct | injected | fallback
 - Alinear archivos y criterios con las specs.
 - Si existe `design.md`, usarlo para resolver orden y dependencias, no para duplicar texto.
 - Si continuas un `tasks.md` existente, leerlo antes de actualizarlo.
+- Si el plan ya excede el tamano razonable y el corte es claro, detener la fase y materializar la division antes de seguir.
 
 ## Optional Modules
 

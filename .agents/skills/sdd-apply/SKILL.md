@@ -86,8 +86,10 @@ Luego:
 2. leer `design.md` si esa tarea depende de decisiones estructurales
 3. leer los archivos listados en la tarea si ya existen
 4. implementar siguiendo la spec como fuente de verdad del QUE
-5. verificar que el criterio de la tarea se cumple
-6. marcar `[x]` solo cuando la tarea este realmente completa
+5. si para completar la tarea hubo que cambiar comportamiento no cubierto por la spec, actualizar la spec o delta correspondiente en el mismo batch, o detener la tarea para volver a `sdd-spec`/`sdd-design`
+6. si la tarea revierte una decision ya registrada (`D-XX`) o reabre un comportamiento que parecia resuelto, registrar el edge case que lo justifica y agregar una validacion puntual antes de cerrarla
+7. verificar que el criterio de la tarea se cumple
+8. marcar `[x]` solo cuando la tarea este realmente completa
 
 **Cuando una tarea se bloquea**, no reportar en abstracto. Presentar opciones concretas:
 
@@ -115,6 +117,14 @@ Actualizar:
 - `tasks.md` para reflejar el estado real de cada tarea del lote
 - `state.md` siguiendo `_shared/phase-common.md`
 - la tabla de archivos afectados dentro de `state.md`
+
+Antes de actualizar `state.md`, confirmar cada fix o ajuste con evidencia local. Orden preferido:
+
+1. test o validacion puntual del slice tocado
+2. grep o `read_file` sobre el archivo para confirmar que el cambio esperado quedo en disco
+3. lint, typecheck o comando acotado para el archivo o modulo tocado
+
+Un lote no cuenta como hecho solo porque el edit fue intentado. `state.md` debe reflejar codigo realmente cambiado y evidencia realmente observada.
 
 Registrar cada archivo creado o modificado con el requirement correspondiente. Ese rastro lo usan después `verify` y `archive`.
 
@@ -190,6 +200,8 @@ skill_resolution: disabled | direct | injected | fallback
 - Si una tarea queda bloqueada, usar `[~]` y documentar el motivo.
 - Si la spec es incorrecta o incompleta, detenerse y sugerir qué artefacto actualizar.
 - Comunicar progreso visible: qué tarea se está implementando y resumen al cerrar el batch.
+- No adelantar `state.md`: primero evidencia local del cambio, después trazabilidad.
+- Si hubo drift entre spec y codigo, corregirlo en el mismo batch o dejar la tarea bloqueada explicitamente.
 
 ## Optional Modules
 

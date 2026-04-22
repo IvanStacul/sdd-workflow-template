@@ -75,6 +75,40 @@ Se investigó cómo cada editor (VS Code, Claude Code, Cursor, OpenCode) maneja 
 
 ---
 
+## Guardrails operativos desde retros de workflow (2026-04-22)
+
+**Estado**: aplicada
+**Origen**: patch-2026-04-22-01-workflow-retro-guardrails
+**Skills/archivos afectados**: `.agents/skills/sdd-propose/SKILL.md`, `.agents/skills/sdd-spec/SKILL.md`, `.agents/skills/sdd-tasks/SKILL.md`, `.agents/skills/sdd-apply/SKILL.md`, `.agents/skills/sdd-archive/SKILL.md`
+
+Se absorbieron guardrails recurrentes detectados en retros de otro repo para que el workflow no dependa de memoria conversacional ni de recomendaciones abstractas:
+
+- **Division materializada de changes grandes** — `sdd-propose` ya no debe dejar un "conviene dividir" vacio; debe nombrar slices concretos. `sdd-spec` debe materializar ese corte en specs separadas y `sdd-tasks` debe detenerse antes de emitir un `tasks.md` gigante cuando el corte ya es claro.
+- **Contratos minimos en tareas riesgosas** — `sdd-tasks` ahora exige ejemplos minimos observables cuando una tarea cruza fronteras entre capas o subsistemas, y pide validacion minima para slices interactivos o flujos backend nuevos.
+- **Evidencia antes de `state.md`** — `sdd-apply` debe confirmar que el cambio quedo en disco o validar el slice tocado antes de registrar avance. El log ya no puede adelantarse a la realidad del codigo.
+- **Drift spec-codigo visible** — si `apply` cambia comportamiento no cubierto por la spec o revierte una decision previa, debe corregir la spec en el mismo batch o bloquear la tarea con contexto explicito.
+- **Reconciliacion en archive** — `sdd-archive` debe contrastar decisiones y delta specs antes del merge final para no consolidar texto desactualizado.
+
+---
+
+## Checklist compartida en phase-common para guardrails operativos (2026-04-22)
+
+**Estado**: aplicada
+**Origen**: patch-2026-04-22-02-phase-common-operational-checklist
+**Skills/archivos afectados**: `.agents/skills/_shared/phase-common.md`, `docs/known-issues.md`
+
+Se agrego una checklist compartida en `_shared/phase-common.md` para que los guardrails introducidos por el patch anterior no queden solo repartidos en skills puntuales.
+
+- **Corte materializado o rerutado** — si el scope ya es grande y el corte es claro, la fase no debe seguir como si nada.
+- **Contrato minimo en slices riesgosos** — cuando un slice cruza capas o subsistemas, debe quedar al menos un ejemplo observable y una validacion minima.
+- **Evidencia antes de trazabilidad** — `state.md` no debe adelantarse al cambio real o al artefacto realmente generado.
+- **Drift visible** — la checklist recuerda que spec, codigo y decisiones no pueden divergir en silencio.
+- **Reconciliacion previa a sync** — archive debe seguir contrastando texto consolidado contra decisiones y comportamiento validado.
+
+Con esto, una skill nueva que siga `phase-common` arranca con la misma memoria operativa base, sin depender solo de que alguien replique estas reglas en su `SKILL.md`.
+
+---
+
 <!-- Formato para entradas futuras:
 
 ## {Descripción} ({YYYY-MM-DD})

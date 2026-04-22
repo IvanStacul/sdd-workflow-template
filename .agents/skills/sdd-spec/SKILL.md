@@ -46,6 +46,8 @@ Leer `proposal.md` y separar:
 
 Si `proposal.md` no deja suficientemente clara esta separación, corregir la ambigüedad en la propuesta o devolver riesgo explícito. No inventes mappings silenciosos.
 
+Si `proposal.md` ya resolvió un corte para partir un change grande en slices mas chicos, reflejar ese corte en specs separadas desde esta fase. No dejar la división solo narrada en `proposal.md` para que `sdd-tasks` la descubra después.
+
 ### Step 2: Resolver numeración y paths
 
 Para cada capability:
@@ -58,6 +60,8 @@ Para cada capability:
   - crear o actualizar `openspec/changes/{change-name}/specs/{NNN-capability}/spec.md`
 
 Si una capability marcada como modificada no existe en `openspec/specs/`, no sigas como si nada. Corregi la propuesta o marca el riesgo explícitamente antes de escribir una delta inconsistente.
+
+Cuando la propuesta fue dividida para preservar continuidad entre sesiones, preferi varias specs chicas y verificables antes que una sola delta paraguas. La división debe quedar materializada en disco en esta fase.
 
 ### Step 3: Leer specs vigentes cuando haya deltas
 
@@ -141,6 +145,7 @@ Antes de cerrar la fase, revisar:
 - `Edge Cases` existe en cada spec del change
 - la spec describe comportamiento, no implementación
 - las delta specs distinguen claramente `ADDED`, `MODIFIED` y `REMOVED`
+- si la propuesta venia dividida, el corte ya quedo materializado en specs separadas y no solo mencionado en texto
 
 ### Step 6: Registrar fase
 
@@ -179,6 +184,7 @@ skill_resolution: disabled | direct | injected | fallback
 - En `MODIFIED`, copiar y editar el bloque completo.
 - Si agregas comportamiento nuevo sin cambiar lo existente, usar `ADDED`, no `MODIFIED`.
 - Si continuas una spec ya empezada, leerla antes de actualizarla.
+- Si la propuesta ya venia partida en slices, escribir esa separacion en archivos de spec distintos desde esta fase.
 
 ## Optional Modules
 

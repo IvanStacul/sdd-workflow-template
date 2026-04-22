@@ -122,7 +122,15 @@ Antes de cerrar la fase, revisar:
 - que riesgos y rollback no hayan quedado vacios
 - que la propuesta alcance para que `sdd-spec` escriba specs sin inferencias grandes
 
-Si el cambio es demasiado grande, recomendar dividirlo en multiples changes antes de avanzar.
+Si el cambio es demasiado grande, NO cerrar la fase con una recomendacion abstracta. Dejar explicitados al menos:
+
+- cortes naturales propuestos
+- nombre tentativo de cada sub-change
+- capabilities incluidas en cada slice
+- dependencias y orden recomendado
+- cual es el primer slice implementable
+
+Si la division ya esta clara y el usuario quiere seguir en la misma sesion, redefinir la propuesta actual como el primer slice implementable en lugar de dejar un change paraguas ambiguo. Los slices restantes deben quedar nombrados y delimitados desde esta fase para que otra sesion pueda retomarlos sin depender del contexto conversacional.
 
 **Criterio de decisión vs pregunta**: si algo es razonablemente inferible del contexto (exploración previa, specs existentes, conversación), tomar la decisión y documentarla en la propuesta. Si falta información que cambia el alcance o las capabilities, preguntar. Preferir mantener el momentum con decisiones razonables antes que frenar con preguntas menores.
 
@@ -168,7 +176,7 @@ skill_resolution: disabled | direct | injected | fallback
 - No meter detalles de implementación en la propuesta; eso pertenece a `sdd-design`.
 - Incluir SIEMPRE `Plan de Rollback`, aunque sea simple
 - Tratar el change como continuación si ya existe directorio o artefactos previos.
-- Si el scope es demasiado grande, recomendar dividir.
+- Si el scope es demasiado grande, dejar la division operativa en la propuesta. No alcanza con "conviene dividir".
 - No dejar `Capabilities` ambiguas: `sdd-spec` depende de esa sección.
 
 ## Optional Modules

@@ -103,6 +103,8 @@ Si `docs/known-issues.md` o `docs/workflow-changelog.md` no existen, no bloquear
 
 ### Step 4: Sincronizar delta specs a specs consolidadas
 
+Antes del preview de sync, contrastar el lenguaje final de cada delta spec con las decisiones registradas en `state.md`. Si una decisión fue revisada durante apply y el delta quedó con texto viejo, corregir el delta usando el comportamiento implementado y validado como fuente de verdad. Archive no debe consolidar texto desactualizado por inercia.
+
 Antes de sincronizar, mostrar un preview de qué va a cambiar:
 
 ```
@@ -223,6 +225,7 @@ skill_resolution: disabled | direct | injected | fallback
 - Mejoras concretas y de bajo riesgo se pueden aplicar directamente.
 - Mejoras complejas quedan como `propuesta` para revision humana.
 - Templates forward-only: cambios a templates NO migran artefactos existentes.
+- Antes del merge final, reconciliar decisiones de `state.md` con el texto de los delta specs.
 - El archive es INMUTABLE: no modificar changes archivados.
 
 ## Optional Modules
